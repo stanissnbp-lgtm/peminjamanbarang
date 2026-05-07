@@ -4,68 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Console Admin | Misdinar Inventory</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/tailwindcss-jit-cdn"></script>
+    <script src="https://unpkg.com/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; overflow-x: hidden; }
-        .nav-active { background: #4f46e5 !important; color: white !important; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
-        .sidebar { background: #0f172a; transition: all 0.3s ease-in-out; z-index: 50; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #000000; overflow-x: hidden; }
+        .nav-active { background-color: #4f46e5 !important; color: #ffffff !important; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
+        
+        .sidebar { 
+            background-color: #0f172a; 
+            transition: all 0.3s ease-in-out; 
+            z-index: 100; 
+            color: #94a3b8;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+
         .page-content { display: none; }
-        #sidebarOverlay { display: none; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 40; }
+        #sidebarOverlay { display: none; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 90; }
+        
+        /* FIX WARNA TULISAN TABEL */
+        table tbody tr td {
+            color: #000000 !important;
+            font-weight: 600; 
+            font-size: 12px;
+        }
+        table thead tr th {
+            color: #64748b !important;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 1.25rem;
+        }
+        input, select { color: #000000 !important; background-color: #ffffff !important; border: 1px solid #e2e8f0 !important; }
+        h2, h1 { color: #ff0000 !important; }
     </style>
 </head>
-<body class="flex flex-col md:flex-row min-h-screen">
+<body class="flex flex-col md:flex-row min-h-screen bg-slate-50">
     <div id="sidebarOverlay" class="fixed inset-0 md:hidden" onclick="toggleSidebar()"></div>
 
-    <div class="md:hidden flex items-center justify-between p-5 bg-white border-b sticky top-0 z-30">
-        <button onclick="toggleSidebar()" class="p-2 text-slate-600 bg-slate-50 rounded-xl">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-        </button>
-        <h1 class="text-xl font-extrabold text-slate-900 italic tracking-tighter">Misdinar<span class="text-indigo-600">.</span>Admin</h1>
-    </div>
-
-    <aside id="mainSidebar" class="fixed inset-y-0 left-0 w-72 sidebar p-8 flex flex-col text-slate-400 transform -translate-x-full md:translate-x-0 md:relative">
-        <div class="mb-10">
-            <h1 class="text-2xl font-extrabold text-white italic tracking-tighter">Misdinar<span class="text-indigo-500">.</span>Admin</h1>
-            <p id="roleBadge" class="text-[9px] font-bold px-3 py-1 bg-slate-800 text-indigo-400 uppercase mt-3 inline-block rounded-lg tracking-widest italic">Wait...</p>
+    <aside id="mainSidebar" class="fixed inset-y-0 left-0 w-72 sidebar p-8 flex flex-col transform -translate-x-full md:translate-x-0 md:relative shadow-2xl">
+        <div class="flex-1">
+            <div class="mb-10">
+                <h1 class="text-2xl font-extrabold text-white italic tracking-tighter text-red-600">Misdinar<span class="text-white">.</span>Admin</h1>
+                <p id="roleBadge" class="text-[9px] font-bold px-3 py-1 bg-slate-800 text-indigo-400 uppercase mt-3 inline-block rounded-lg tracking-widest italic">Checking...</p>
+            </div>
+            <nav class="flex flex-col gap-3">
+                <button onclick="navTo('stok')" id="btn-stok" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-800">📦 Stok Barang</button>
+                <button onclick="navTo('user')" id="btn-user" class="nav-btn hidden w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-800">👥 Hak Akses User</button>
+                <button onclick="navTo('history')" id="btn-history" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-800">🕵️ Audit Stok</button>
+                <button onclick="navTo('global')" id="btn-global" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-800">📜 Log Peminjaman</button>
+            </nav>
         </div>
-        <nav class="flex flex-col gap-3 flex-1">
-            <button onclick="navTo('stok')" id="btn-stok" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3">📦 Stok Barang</button>
-            <button onclick="navTo('user')" id="btn-user" class="nav-btn hidden w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3">👥 Hak Akses User</button>
-            <button onclick="navTo('history')" id="btn-history" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3">🕵️ Audit Stok</button>
-            <button onclick="navTo('global')" id="btn-global" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3">📜 Log Peminjaman</button>
-        </nav>
-        <div class="mt-auto pt-8 border-t border-slate-800 space-y-4">
-            <a href="index.html" class="block text-center text-xs font-bold text-indigo-400 hover:underline uppercase italic">← Peminjaman</a>
-            <button id="btnLogout" class="w-full bg-slate-800 text-white py-4 rounded-2xl text-xs font-bold hover:bg-rose-900 transition">Logout</button>
+
+        <div class="pt-8 border-t border-slate-800 space-y-4 bg-[#0f172a]">
+            <a href="index.html" class="block text-center text-[10px] font-bold text-indigo-400 hover:text-indigo-300 uppercase italic tracking-widest">← Kembali Ke Peminjaman</a>
+            <button id="btnLogout" class="w-full bg-slate-800 text-white py-4 rounded-2xl text-xs font-bold hover:bg-rose-900 transition shadow-lg active:scale-95">Logout</button>
         </div>
     </aside>
 
     <main class="flex-1 p-6 md:p-16 overflow-y-auto">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-            <h2 id="page-title" class="text-3xl font-extrabold text-slate-900 italic tracking-tight uppercase">Dashboard</h2>
+            <h2 id="page-title" class="text-3xl font-extrabold italic tracking-tight uppercase text-slate-900">Dashboard</h2>
             <p id="adminEmail" class="text-sm font-bold text-slate-500 italic"></p>
         </div>
 
         <section id="page-stok" class="page-content">
-            <div class="bg-indigo-600 p-8 rounded-[2.5rem] mb-10 flex flex-col md:flex-row gap-4 shadow-xl shadow-indigo-100">
-                <input type="text" id="namaBarang" placeholder="Nama Barang..." class="flex-1 px-6 py-4 rounded-2xl border-none outline-none font-bold text-sm">
-                <input type="number" id="stokBarang" placeholder="Qty" class="w-full md:w-24 px-6 py-4 rounded-2xl text-center font-bold text-sm">
-                <button id="btnAddItem" class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-black transition">SIMPAN</button>
+            <div class="bg-indigo-600 p-8 rounded-[2.5rem] mb-10 flex flex-col md:flex-row gap-4 shadow-xl">
+                <input type="text" id="namaBarang" placeholder="Nama Barang..." class="flex-1 px-6 py-4 rounded-2xl outline-none font-bold">
+                <input type="number" id="stokBarang" placeholder="Qty" class="w-full md:w-24 px-6 py-4 rounded-2xl text-center font-bold">
+                <button id="btnAddItem" class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-black transition shadow-lg">SIMPAN</button>
             </div>
-            <div class="bg-white rounded-3xl p-6 border border-slate-100 overflow-x-auto"><table class="w-full text-left"><tbody id="inventoryBody" class="divide-y divide-slate-50"></tbody></table></div>
+            <div class="bg-white rounded-3xl p-6 border border-slate-100 overflow-x-auto shadow-md">
+                <table class="w-full text-left">
+                    <thead><tr class="border-b"><th>Nama Barang</th><th class="text-center">Stok</th><th class="text-right">Aksi</th></tr></thead>
+                    <tbody id="inventoryBody" class="divide-y divide-slate-50"></tbody>
+                </table>
+            </div>
         </section>
 
-        <section id="page-user" class="page-content"><div class="bg-white rounded-3xl p-6 border border-slate-100 overflow-x-auto"><table class="w-full text-left text-sm"><tbody id="userTableBody" class="divide-y divide-slate-50"></tbody></table></div></section>
-        <section id="page-history" class="page-content"><div class="bg-white rounded-3xl p-6 border border-slate-100 overflow-x-auto"><table class="w-full text-[10px] uppercase tracking-tighter text-left"><tbody id="auditLogBody" class="divide-y divide-slate-50"></tbody></table></div></section>
-        <section id="page-global" class="page-content"><div class="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl overflow-x-auto"><table class="w-full text-[10px] text-left"><tbody id="logBody" class="divide-y divide-slate-800"></tbody></table></div></section>
+        <section id="page-user" class="page-content">
+            <div class="bg-white rounded-3xl p-6 border border-slate-100 overflow-x-auto shadow-md">
+                <table class="w-full text-left">
+                    <thead><tr class="border-b"><th>Email User</th><th>Role</th><th class="text-right">Ubah Akses</th></tr></thead>
+                    <tbody id="userTableBody" class="divide-y divide-slate-50"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="page-history" class="page-content">
+            <div class="bg-white rounded-3xl p-6 border border-slate-100 overflow-x-auto shadow-md">
+                <table class="w-full text-left">
+                    <thead><tr class="border-b"><th>Waktu</th><th>Pelaku</th><th class="text-center">Aksi</th><th class="text-center italic">Detail</th></tr></thead>
+                    <tbody id="auditLogBody" class="divide-y divide-slate-50"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="page-global" class="page-content">
+            <div class="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-md overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead><tr class="border-b"><th>Waktu</th><th>Peminjam</th><th class="text-center">Barang</th><th class="text-center">Status</th><th class="text-right">Bukti</th></tr></thead>
+                    <tbody id="logBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc, query, orderBy, serverTimestamp, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc, query, orderBy, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFX7SWWK8z0cQD3m4KNKjW3VCMbEjA_Tg",
@@ -75,6 +125,7 @@
             messagingSenderId: "301829936342",
             appId: "1:301829936342:web:4584de1f4740d4c978e577"
         };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -89,7 +140,9 @@
                     globalRole = userDoc.data().role;
                     document.getElementById('roleBadge').innerText = globalRole;
                     if (globalRole === 'admin') document.getElementById('btn-user').classList.remove('hidden');
-                    if (globalRole === 'admin' || globalRole === 'perlengkapan') { loadAllData(); navTo('stok'); } else { window.location.href = "index.html"; }
+                    if (globalRole === 'admin' || globalRole === 'perlengkapan') {
+                        navTo('stok'); loadAllData();
+                    } else { window.location.href = "index.html"; }
                 }
             } else { window.location.href = "login.html"; }
         });
@@ -97,24 +150,34 @@
         window.navTo = (id) => {
             document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-            document.getElementById('page-' + id).style.display = 'block';
-            document.getElementById('btn-' + id).classList.add('nav-active');
+            const target = document.getElementById('page-' + id);
+            if(target) {
+                target.style.display = 'block';
+                const btn = document.getElementById('btn-' + id);
+                if(btn) btn.classList.add('nav-active');
+                document.getElementById('page-title').innerText = id === 'global' ? 'Log Peminjaman' : id.toUpperCase();
+            }
             if (window.innerWidth < 768) toggleSidebar();
         };
 
         window.toggleSidebar = () => {
             const sb = document.getElementById('mainSidebar');
-            const ov = document.getElementById('sidebarOverlay');
             sb.classList.toggle('-translate-x-full');
-            ov.style.display = sb.classList.contains('-translate-x-full') ? 'none' : 'block';
+            document.getElementById('sidebarOverlay').style.display = sb.classList.contains('-translate-x-full') ? 'none' : 'block';
         };
 
-        async function loadAllData() { loadInventory(); loadUsers(); loadAuditLogs(); loadLoanLogs(); }
+        async function loadAllData() {
+            loadInventory(); loadUsers(); loadAuditLogs(); loadLoanLogs();
+        }
+
         async function loadInventory() {
             const snap = await getDocs(collection(db, "inventory"));
             const body = document.getElementById('inventoryBody'); body.innerHTML = "";
-            snap.forEach(d => body.innerHTML += `<tr><td class="p-5 font-bold uppercase text-xs italic">${d.data().nama}</td><td class="p-5 text-center text-indigo-600 font-extrabold text-lg">${d.data().stok}</td><td class="p-5 text-right"><button onclick="deleteItem('${d.id}', '${d.data().nama}')" class="text-rose-500 font-bold text-[9px] uppercase tracking-widest">Hapus</button></td></tr>`);
+            snap.forEach(d => {
+                body.innerHTML += `<tr><td class="p-5 uppercase font-bold text-black">${d.data().nama}</td><td class="p-5 text-center text-indigo-600 font-extrabold text-lg">${d.data().stok}</td><td class="p-5 text-right"><button onclick="deleteItem('${d.id}', '${d.data().nama}')" class="text-rose-500 font-bold text-[9px] uppercase tracking-widest hover:underline">Hapus</button></td></tr>`;
+            });
         }
+
         document.getElementById('btnAddItem').onclick = async () => {
             const nama = document.getElementById('namaBarang').value;
             const stok = parseInt(document.getElementById('stokBarang').value);
@@ -122,34 +185,44 @@
             await addDoc(collection(db, "inventory"), { nama, stok });
             await addDoc(collection(db, "logs_stok"), { waktu: serverTimestamp(), pelaku: currentUserEmail, aksi: "TAMBAH", detail: `${nama} (${stok})` });
             loadInventory(); loadAuditLogs();
+            document.getElementById('namaBarang').value = ""; document.getElementById('stokBarang').value = "";
         };
+
         window.deleteItem = async (id, nm) => {
-            if((await Swal.fire({ title: 'Hapus?', text: nm, icon: 'warning', showCancelButton: true })).isConfirmed) {
+            if(confirm(`Hapus ${nm}?`)) {
                 await deleteDoc(doc(db, "inventory", id));
                 await addDoc(collection(db, "logs_stok"), { waktu: serverTimestamp(), pelaku: currentUserEmail, aksi: "HAPUS", detail: nm });
                 loadInventory(); loadAuditLogs();
             }
         };
+
         async function loadUsers() {
             const snap = await getDocs(collection(db, "users"));
             const body = document.getElementById('userTableBody'); body.innerHTML = "";
             snap.forEach(d => {
                 const r = d.data().role || "user";
-                body.innerHTML += `<tr><td class="p-5 font-bold text-slate-700">${d.data().email}</td><td><span class="px-2 py-1 rounded-lg text-[9px] font-extrabold uppercase ${r === 'admin' ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}">${r}</span></td><td class="text-right"><select onchange="updateRole('${d.id}', this.value)" class="text-[9px] border p-2 rounded-lg"><option value="">--</option><option value="user">User</option><option value="perlengkapan">Perlengkapan</option><option value="admin">Admin</option></select></td></tr>`;
+                body.innerHTML += `<tr><td class="p-5 font-bold text-black">${d.data().email}</td><td><span class="px-2 py-1 rounded-lg text-[9px] font-extrabold uppercase ${r === 'admin' ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}">${r}</span></td><td class="text-right"><select onchange="updateRole('${d.id}', this.value)" class="text-[9px] border p-2 rounded-lg text-black bg-white"><option value="">--</option><option value="user">User</option><option value="perlengkapan">Perlengkapan</option><option value="admin">Admin</option></select></td></tr>`;
             });
         }
+
         window.updateRole = async (id, r) => { if(!r) return; await updateDoc(doc(db, "users", id), { role: r }); loadUsers(); };
+
         async function loadAuditLogs() {
-            const q = query(collection(db, "logs_stok"), orderBy("waktu", "desc"));
-            const snap = await getDocs(q); const body = document.getElementById('auditLogBody'); body.innerHTML = "";
-            snap.forEach(d => body.innerHTML += `<tr><td class="p-4 italic text-slate-400">${d.data().waktu?.toDate().toLocaleString() || '-'}</td><td class="p-4 text-slate-500">${d.data().pelaku}</td><td class="p-4 text-center ${d.data().aksi === 'TAMBAH' ? 'text-emerald-500' : 'text-rose-500'}">${d.data().aksi}</td><td class="p-4 italic text-center">${d.data().detail}</td></tr>`);
+            const body = document.getElementById('auditLogBody'); body.innerHTML = "";
+            const snap = await getDocs(collection(db, "logs_stok"));
+            snap.forEach(d => {
+                const t = d.data().waktu?.toDate().toLocaleString() || '-';
+                body.innerHTML += `<tr><td class="p-4 italic text-slate-500 text-xs">${t}</td><td class="p-4 text-black text-xs">${d.data().pelaku}</td><td class="p-4 text-center font-bold text-xs ${d.data().aksi === 'TAMBAH' ? 'text-emerald-600' : 'text-rose-600'}">${d.data().aksi}</td><td class="p-4 italic text-center text-black text-xs">${d.data().detail}</td></tr>`;
+            });
         }
+
         async function loadLoanLogs() {
-            onSnapshot(query(collection(db, "loans"), orderBy("waktu_pinjam", "desc")), (snap) => {
+            onSnapshot(collection(db, "loans"), (snap) => {
                 const body = document.getElementById('logBody'); body.innerHTML = "";
                 snap.forEach(docSnap => {
                     const d = docSnap.data();
-                    body.innerHTML += `<tr><td class="py-4 px-2 text-slate-500 italic">${d.waktu_pinjam?.toDate().toLocaleString() || '-'}</td><td class="py-4 px-2 uppercase font-bold text-slate-500">${d.peminjam.split('@')[0]}</td><td class="py-4 px-2 text-center font-extrabold uppercase">${d.barang} (x${d.jumlah})</td><td class="py-4 px-2 text-center uppercase tracking-widest ${d.status === 'kembali' ? 'text-emerald-400' : 'text-amber-400'}">${d.status}</td><td class="py-4 px-2">${d.foto_url ? `<a href="${d.foto_url}" target="_blank" class="text-indigo-400 font-bold italic">[ LIHAT FOTO ]</a>` : '-'}</td></tr>`;
+                    const t = d.waktu_pinjam?.toDate().toLocaleString() || '-';
+                    body.innerHTML += `<tr class="border-b border-slate-100"><td class="py-4 px-2 text-slate-500 italic text-xs">${t}</td><td class="py-4 px-2 uppercase font-bold text-black text-xs">${d.peminjam.split('@')[0]}</td><td class="py-4 px-2 text-center font-extrabold uppercase text-black text-xs">${d.barang} (x${d.jumlah})</td><td class="py-4 px-2 text-center uppercase tracking-widest font-bold text-xs ${d.status === 'kembali' ? 'text-emerald-600' : 'text-amber-600'}">${d.status}</td><td class="py-4 px-2 text-right">${d.foto_url ? `<a href="${d.foto_url}" target="_blank" class="text-indigo-600 font-bold hover:underline italic">[ BUKTI ]</a>` : '-'}</td></tr>`;
                 });
             });
         }
