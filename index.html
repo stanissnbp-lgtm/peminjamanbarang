@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misdinar Inventory | User</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top left, #f8fafc, #f1f5f9); min-height: 100vh; }
+        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); }
+        .btn-primary { background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-end mb-12">
+            <div>
+                <h1 class="text-4xl font-extrabold text-slate-900 tracking-tighter">Misdinar<span class="text-indigo-600">.</span></h1>
+                <p id="userEmailDisplay" class="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-[0.2em]">MEMUAT PROFIL...</p>
+            </div>
+            <div class="flex gap-3">
+                <a href="admin.html" id="adminBtn" class="hidden glass-card px-5 py-3 rounded-2xl text-slate-700 font-bold text-xs flex items-center gap-2 hover:bg-white transition">⚡ Panel Kontrol</a>
+                <button id="btnLogout" class="bg-rose-50 text-rose-600 px-5 py-3 rounded-2xl font-bold text-xs hover:bg-rose-100 transition">Logout</button>
+            </div>
+        </header>
+
+        <div class="glass-card rounded-[2.5rem] p-8 md:p-10 mb-12">
+            <div class="flex items-center gap-3 mb-8"><div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg">🛒</div><h2 class="text-xl font-bold text-slate-800 tracking-tight">Keranjang Pinjaman</h2></div>
+            <div class="space-y-6">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1 space-y-2">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Pilih Inventaris</label>
+                        <select id="barangSelect" class="w-full px-6 py-4 bg-white border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-100 font-semibold text-slate-700 transition appearance-none"></select>
+                    </div>
+                    <div class="w-full md:w-32 space-y-2">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Jumlah</label>
+                        <input type="number" id="jumlahInput" value="1" min="1" class="w-full px-6 py-4 bg-white border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-100 font-bold text-center">
+                    </div>
+                    <div class="flex items-end"><button id="btnTambahKeranjang" class="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition active:scale-95 shadow-lg">TAMBAHKAN</button></div>
+                </div>
+                <div id="cartItems" class="space-y-3 py-6 border-y border-slate-100"><p class="text-center text-slate-400 text-sm font-medium">keranjangnya diisi dulu yaaa.</p></div>
+                <button id="btnCheckout" class="w-full btn-primary text-white py-5 rounded-[1.5rem] font-extrabold shadow-xl hidden uppercase tracking-widest text-sm">Proses Peminjaman Sekarang</button>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 mb-8"><h2 class="text-2xl font-extrabold text-slate-800 tracking-tight whitespace-nowrap">Riwayat Pinjaman</h2><div class="h-[2px] w-full bg-slate-200 rounded-full opacity-50"></div></div>
+        <div id="loanList" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, getDoc, query, orderBy, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFX7SWWK8z0cQD3m4KNKjW3VCMbEjA_Tg",
+            authDomain: "testing-6b1d1.firebaseapp.com",
+            projectId: "testing-6b1d1",
+            storageBucket: "testing-6b1d1.firebasestorage.app",
+            messagingSenderId: "301829936342",
+            appId: "1:301829936342:web:4584de1f4740d4c978e577"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserEmail = "";
+        let cart = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) window.location.href = 'login.html';
+            currentUserEmail = user.email;
+            document.getElementById('userEmailDisplay').innerText = user.email;
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists() && (userDoc.data().role === 'admin' || userDoc.data().role === 'perlengkapan')) {
+                document.getElementById('adminBtn').classList.remove('hidden');
+            }
+            loadInventory();
+            initLoansRealtime();
+        });
+
+        async function loadInventory() {
+            const snap = await getDocs(collection(db, "inventory"));
+            const select = document.getElementById('barangSelect');
+            select.innerHTML = '<option value="">Pilih Barang...</option>';
+            snap.forEach(d => {
+                select.innerHTML += `<option value="${d.data().nama}" data-stok="${d.data().stok}">${d.data().nama} (Sisa: ${d.data().stok})</option>`;
+            });
+        }
+
+        document.getElementById('btnTambahKeranjang').onclick = () => {
+            const select = document.getElementById('barangSelect');
+            const barang = select.value;
+            const jumlah = parseInt(document.getElementById('jumlahInput').value);
+            const stokTersedia = parseInt(select.options[select.selectedIndex]?.getAttribute('data-stok') || 0);
+
+            if(!barang || isNaN(jumlah) || jumlah <= 0) return;
+            if(jumlah > stokTersedia) return Swal.fire('Stok Kurang', `Sisa ${stokTersedia}`, 'error');
+            cart.push({ barang, jumlah });
+            renderCart();
+        };
+
+        function renderCart() {
+            const container = document.getElementById('cartItems');
+            const btn = document.getElementById('btnCheckout');
+            container.innerHTML = cart.length === 0 ? '<p class="text-center text-slate-400 text-sm font-medium">Keranjang lu masih kosong, *jing*.</p>' : '';
+            cart.forEach((item, index) => {
+                container.innerHTML += `<div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm"><span class="font-bold text-slate-700">${item.barang} <span class="text-indigo-600 ml-2">x${item.jumlah}</span></span><button onclick="removeItem(${index})" class="text-rose-500 font-bold text-xs uppercase tracking-widest">Batal</button></div>`;
+            });
+            cart.length > 0 ? btn.classList.remove('hidden') : btn.classList.add('hidden');
+        }
+        window.removeItem = (i) => { cart.splice(i, 1); renderCart(); };
+
+        document.getElementById('btnCheckout').onclick = async () => {
+            Swal.fire({ title: 'Memproses...', didOpen: () => Swal.showLoading() });
+            try {
+                for (const item of cart) {
+                    const qInv = query(collection(db, "inventory"), where("nama", "==", item.barang));
+                    const snapInv = await getDocs(qInv);
+                    const invDoc = snapInv.docs[0];
+                    await updateDoc(invDoc.ref, { stok: invDoc.data().stok - item.jumlah });
+                    await addDoc(collection(db, "loans"), { peminjam: currentUserEmail, barang: item.barang, jumlah: item.jumlah, status: "dipinjam", waktu_pinjam: serverTimestamp(), laporan: "", foto_url: "" });
+                }
+                cart = []; renderCart(); loadInventory();
+                Swal.fire('Berhasil!', 'Barang dipinjam.', 'success');
+            } catch (e) { Swal.fire('Error', e.message, 'error'); }
+        };
+
+        function initLoansRealtime() {
+            onSnapshot(query(collection(db, "loans"), orderBy("waktu_pinjam", "desc")), (snap) => {
+                const list = document.getElementById('loanList');
+                list.innerHTML = "";
+                snap.forEach(docSnap => {
+                    const d = docSnap.data();
+                    if(d.peminjam === currentUserEmail) {
+                        const isDipinjam = d.status === "dipinjam";
+                        list.innerHTML += `<div class="glass-card p-6 rounded-3xl flex justify-between items-center"><div><h3 class="font-bold text-slate-800">${d.barang} (x${d.jumlah})</h3><p class="text-[9px] font-bold uppercase tracking-widest ${isDipinjam ? 'text-amber-500' : 'text-emerald-500'}">${d.status}</p></div>${isDipinjam ? `<button onclick="kembalikanBarang('${docSnap.id}', '${d.barang}', ${d.jumlah})" class="bg-slate-900 text-white text-[10px] px-5 py-2 rounded-xl font-bold uppercase hover:bg-indigo-600 transition">Kembalikan</button>` : '✅'}</div>`;
+                    }
+                });
+            });
+        }
+
+        window.kembalikanBarang = async (id, nama, jumlah) => {
+            const { value: form } = await Swal.fire({
+                title: `Kembalikan ${nama}`,
+                html: `<div class="text-left space-y-2"><label class="text-[10px] font-bold text-slate-400 uppercase">Link Foto Bukti (WAJIB)</label><input id="swal-foto" class="swal2-input" placeholder="https://..."><label class="text-[10px] font-bold text-slate-400 uppercase block mt-3">Laporan (OPSIONAL)</label><input id="swal-lap" class="swal2-input" placeholder="Kondisi barang..."></div>`,
+                preConfirm: () => {
+                    const foto = document.getElementById('swal-foto').value.trim();
+                    if (!foto || !/\.(jpg|jpeg|png|webp)$/i.test(foto.split('?')[0])) { Swal.showValidationMessage('Wajib link foto asli (.jpg/.png)!'); return false; }
+                    return { foto, lap: document.getElementById('swal-lap').value.trim() };
+                }
+            });
+            if (form) {
+                await updateDoc(doc(db, "loans", id), { status: "kembali", laporan: form.lap || "Ok", foto_url: form.foto, waktu_kembali: serverTimestamp() });
+                const qInv = query(collection(db, "inventory"), where("nama", "==", nama));
+                const snapInv = await getDocs(qInv);
+                if (!snapInv.empty) await updateDoc(snapInv.docs[0].ref, { stok: snapInv.docs[0].data().stok + jumlah });
+                loadInventory(); Swal.fire('Selesai!', 'Stok balik.', 'success');
+            }
+        };
+
+        document.getElementById('btnLogout').onclick = () => signOut(auth);
+    </script>
+</body>
+</html>
