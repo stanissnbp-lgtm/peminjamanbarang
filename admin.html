@@ -6,62 +6,94 @@
     <title>Console Admin | Misdinar Inventory</title>
     <script src="https://unpkg.com/tailwindcss-jit-cdn"></script>
     <script src="https://unpkg.com/sweetalert2@11"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #000000; overflow-x: hidden; }
-        .nav-active { background-color: #4f46e5 !important; color: #ffffff !important; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
-        
-        .sidebar { 
-            background-color: #0f172a; 
-            transition: all 0.3s ease-in-out; 
-            z-index: 100; 
-            color: #94a3b8;
-            height: 100vh;
-            position: sticky;
-            top: 0;
-        }
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">\
+<style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #000000; margin: 0; }
+    
+    /* SIDEBAR: Kunci Warna & Posisi */
+    .sidebar { 
+        background-color: #020617 !important; /* Biru Gelap Padet */
+        transition: all 0.3s ease-in-out; 
+        z-index: 1000; /* Super depan */
+        color: #94a3b8;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 18rem;
+    }
 
-        .page-content { display: none; }
-        #sidebarOverlay { display: none; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 90; }
-        
-        /* FIX WARNA TULISAN TABEL */
-        table tbody tr td {
-            color: #000000 !important;
-            font-weight: 600; 
-            font-size: 12px;
-        }
-        table thead tr th {
-            color: #64748b !important;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 1.25rem;
-        }
-        input, select { color: #000000 !important; background-color: #ffffff !important; border: 1px solid #e2e8f0 !important; }
-        h2, h1 { color: #ff0000 !important; }
-    </style>
-</head>
-<body class="flex flex-col md:flex-row min-h-screen bg-slate-50">
-    <div id="sidebarOverlay" class="fixed inset-0 md:hidden" onclick="toggleSidebar()"></div>
+    /* Overlay buat nutup sidebar */
+    #sidebarOverlay { 
+        display: none; 
+        background-color: rgba(0, 0, 0, 0.7); 
+        backdrop-filter: blur(4px); 
+        z-index: 900; 
+        position: fixed; 
+        inset: 0;
+    }
 
-    <aside id="mainSidebar" class="fixed inset-y-0 left-0 w-72 sidebar p-8 flex flex-col transform -translate-x-full md:translate-x-0 md:relative shadow-2xl">
+    /* Paksa Konten Geser di Desktop */
+    @media (min-width: 768px) {
+        main { margin-left: 18rem; }
+    }
+
+    .nav-active { background-color: #4f46e5 !important; color: #ffffff !important; font-weight: 800; }
+    
+    /* FIX WARNA TEXT TABEL */
+    table tbody tr td { color: #000000 !important; font-weight: 600; }
+    
+    /* FIX TOMBOL MENU BIAR KAGA TRANSPARAN */
+    .btn-menu-mobile {
+        background-color: #000000 !important; /* Hitam Padet */
+        color: #ffffff !important;
+        border: none;
+        padding: 12px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<body class="min-h-screen bg-slate-50">
+    <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <aside id="mainSidebar" class="sidebar p-8 flex flex-col transform -translate-x-full md:translate-x-0 shadow-2xl">
         <div class="flex-1">
             <div class="mb-10">
-                <h1 class="text-2xl font-extrabold text-white italic tracking-tighter text-red-600">Misdinar<span class="text-white">.</span>Admin</h1>
-                <p id="roleBadge" class="text-[9px] font-bold px-3 py-1 bg-slate-800 text-indigo-400 uppercase mt-3 inline-block rounded-lg tracking-widest italic">Checking...</p>
+                <h1 class="text-2xl font-black text-white italic tracking-tighter">Misdinar<span class="text-indigo-500">.</span>Admin</h1>
+                <p id="roleBadge" class="text-[10px] font-bold px-3 py-1 bg-slate-900 text-indigo-400 uppercase mt-3 inline-block rounded-lg tracking-widest italic border border-slate-800">Checking...</p>
             </div>
-            <nav class="flex flex-col gap-3">
-                <button onclick="navTo('stok')" id="btn-stok" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-800">📦 Stok Barang</button>
-                <button onclick="navTo('user')" id="btn-user" class="nav-btn hidden w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-800">👥 Hak Akses User</button>
-                <button onclick="navTo('history')" id="btn-history" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-800">🕵️ Audit Stok</button>
-                <button onclick="navTo('global')" id="btn-global" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-800">📜 Log Peminjaman</button>
+            <nav class="flex flex-col gap-2">
+                <button onclick="navTo('stok')" id="btn-stok" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-900">📦 Stok Barang</button>
+                <button onclick="navTo('user')" id="btn-user" class="nav-btn hidden w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-900">👥 Hak Akses User</button>
+                <button onclick="navTo('history')" id="btn-history" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-900">🕵️ Audit Stok</button>
+                <button onclick="navTo('global')" id="btn-global" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-900">📜 Log Peminjaman</button>
             </nav>
         </div>
-
-        <div class="pt-8 border-t border-slate-800 space-y-4 bg-[#0f172a]">
-            <a href="index.html" class="block text-center text-[10px] font-bold text-indigo-400 hover:text-indigo-300 uppercase italic tracking-widest">← Kembali Ke Peminjaman</a>
-            <button id="btnLogout" class="w-full bg-slate-800 text-white py-4 rounded-2xl text-xs font-bold hover:bg-rose-900 transition shadow-lg active:scale-95">Logout</button>
+        <div class="pt-8 border-t border-slate-800 space-y-4">
+            <a href="index.html" class="block text-center text-[10px] font-bold text-indigo-400 uppercase italic tracking-widest hover:text-white transition">← Ke Peminjaman</a>
+            <button id="btnLogout" class="w-full bg-slate-900 text-rose-500 border border-rose-900/30 py-4 rounded-2xl text-xs font-bold hover:bg-rose-900 hover:text-white transition">Logout</button>
         </div>
+    </aside>
+
+    <main class="p-6 md:p-16">
+        <div class="md:hidden flex items-center justify-between mb-8 bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
+            <button onclick="toggleSidebar()" class="btn-menu-mobile">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <h1 class="text-xl font-black italic text-slate-900">Misdinar<span class="text-indigo-600">.</span>Admin</h1>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+            <h2 id="page-title" class="text-3xl font-extrabold italic tracking-tight uppercase text-slate-900">Dashboard</h2>
+            <p id="adminEmail" class="text-sm font-bold text-slate-500 italic"></p>
+        </div>
+
     </aside>
 
     <main class="flex-1 p-6 md:p-16 overflow-y-auto">
