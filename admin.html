@@ -6,71 +6,56 @@
     <title>Console Admin | Misdinar Inventory</title>
     <script src="https://unpkg.com/tailwindcss-jit-cdn"></script>
     <script src="https://unpkg.com/sweetalert2@11"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">\
-<style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #000000; margin: 0; }
-    
-    /* SIDEBAR: Kunci Warna & Posisi */
-    .sidebar { 
-        background-color: #020617 !important; /* Biru Gelap Padet */
-        transition: all 0.3s ease-in-out; 
-        z-index: 1000; /* Super depan */
-        color: #94a3b8;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 18rem;
-    }
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #000000; margin: 0; }
+        
+        .sidebar { background-color: rgba(2, 6, 23, 0.85) !important; backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.05); transition: all 0.3s ease-in-out; z-index: 2000; color: #94a3b8; height: 100vh; position: fixed; top: 0; left: 0; width: 18rem; }
+        #sidebarOverlay { display: none; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); z-index: 1500; position: fixed; inset: 0; }
+        @media (min-width: 768px) { main { margin-left: 18rem; } }
+        .nav-active { background-color: #4f46e5 !important; color: #ffffff !important; font-weight: 800; }
+        table tbody tr td { color: #000000 !important; font-weight: 600; font-size: 12px; }
+        input, select { color: #000000 !important; background-color: rgba(255,255,255,0.8) !important; border: 1px solid transparent !important; transition: all 0.3s !important; outline: none !important; }
+        input:focus, select:focus { border: 2px solid #818cf8 !important; background-color: #ffffff !important; }
+        input:hover, select:hover { background-color: rgba(255,255,255,1) !important; }
+        .btn-menu-mobile { background-color: #000000 !important; color: #ffffff !important; border: none; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .sticky-header { position: sticky; top: 0; z-index: 1100; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #e2e8f0; }
 
-    /* Overlay buat nutup sidebar */
-    #sidebarOverlay { 
-        display: none; 
-        background-color: rgba(0, 0, 0, 0.7); 
-        backdrop-filter: blur(4px); 
-        z-index: 900; 
-        position: fixed; 
-        inset: 0;
-    }
-
-    /* Paksa Konten Geser di Desktop */
-    @media (min-width: 768px) {
-        main { margin-left: 18rem; }
-    }
-
-    .nav-active { background-color: #4f46e5 !important; color: #ffffff !important; font-weight: 800; }
-    
-    /* FIX WARNA TEXT TABEL */
-    table tbody tr td { color: #000000 !important; font-weight: 600; }
-    
-    /* FIX TOMBOL MENU BIAR KAGA TRANSPARAN */
-    .btn-menu-mobile {
-        background-color: #000000 !important; /* Hitam Padet */
-        color: #ffffff !important;
-        border: none;
-        padding: 12px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-</style>
-
-<body class="min-h-screen bg-slate-50">
+        /* UPGRADE 1: Animasi Fade In buat perpindahan tab */
+        .page-content { display: none; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 7s infinite; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 relative overflow-x-hidden">
+    <!-- Animated Background Blobs -->
+    <div class="fixed top-0 -left-4 w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob pointer-events-none z-0"></div>
+    <div class="fixed top-0 -right-4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob pointer-events-none z-0" style="animation-delay: 2s;"></div>
+    <div class="fixed -bottom-8 left-20 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob pointer-events-none z-0" style="animation-delay: 4s;"></div>
     <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <aside id="mainSidebar" class="sidebar p-8 flex flex-col transform -translate-x-full md:translate-x-0 shadow-2xl">
         <div class="flex-1">
             <div class="mb-10">
-                <h1 class="text-2xl font-black text-white italic tracking-tighter">Misdinar<span class="text-indigo-500">.</span>Admin</h1>
-                <p id="roleBadge" class="text-[10px] font-bold px-3 py-1 bg-slate-900 text-indigo-400 uppercase mt-3 inline-block rounded-lg tracking-widest italic border border-slate-800">Checking...</p>
+                <h1 class="text-2xl font-black text-white italic tracking-tighter text-red-600">Misdinar<span class="text-white">.</span>Admin</h1>
+                <p id="roleBadge" class="text-[10px] font-bold px-3 py-1 bg-slate-800 text-indigo-400 uppercase mt-3 inline-block rounded-lg tracking-widest italic border border-slate-800">Checking...</p>
             </div>
             <nav class="flex flex-col gap-2">
                 <button onclick="navTo('stok')" id="btn-stok" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-900">📦 Stok Barang</button>
                 <button onclick="navTo('user')" id="btn-user" class="nav-btn hidden w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-900">👥 Hak Akses User</button>
                 <button onclick="navTo('history')" id="btn-history" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-900">🕵️ Audit Stok</button>
                 <button onclick="navTo('global')" id="btn-global" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-900">📜 Log Peminjaman</button>
+                <button onclick="navTo('stats')" id="btn-stats" class="nav-btn w-full text-left px-5 py-4 rounded-2xl font-bold text-sm transition flex items-center gap-3 hover:bg-slate-900">📊 Statistik Pinjam</button>
             </nav>
         </div>
         <div class="pt-8 border-t border-slate-800 space-y-4">
@@ -79,69 +64,91 @@
         </div>
     </aside>
 
-    <main class="p-6 md:p-16">
-        <div class="md:hidden flex items-center justify-between mb-8 bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
+    <main class="flex-1">
+        <div class="md:hidden sticky-header flex items-center justify-between p-4 mb-4">
             <button onclick="toggleSidebar()" class="btn-menu-mobile">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16" /></svg>
             </button>
             <h1 class="text-xl font-black italic text-slate-900">Misdinar<span class="text-indigo-600">.</span>Admin</h1>
         </div>
 
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-            <h2 id="page-title" class="text-3xl font-extrabold italic tracking-tight uppercase text-slate-900">Dashboard</h2>
-            <p id="adminEmail" class="text-sm font-bold text-slate-500 italic"></p>
+        <div class="p-6 md:p-16">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+                <h2 id="page-title" class="text-3xl font-extrabold italic tracking-tight uppercase text-slate-900">Dashboard</h2>
+                <p id="adminEmail" class="text-sm font-bold text-slate-500 italic"></p>
+            </div>
+
+            <section id="page-stok" class="page-content">
+                <div class="bg-indigo-600/90 backdrop-blur-xl p-8 rounded-[2.5rem] mb-10 flex flex-col md:flex-row gap-4 shadow-2xl border border-indigo-400/30">
+                    <input type="text" id="namaBarang" placeholder="Nama Barang..." class="flex-1 px-6 py-4 rounded-2xl font-bold text-sm">
+                    <input type="text" id="lokasiBarang" placeholder="Lokasi (Laci 1...)" class="w-full md:w-40 px-6 py-4 rounded-2xl font-bold text-center text-sm">
+                    <input type="number" id="stokBarang" placeholder="Qty" class="w-full md:w-24 px-6 py-4 rounded-2xl text-center font-bold text-sm">
+                    <button id="btnAddItem" class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-black transition-all shadow-[0_4px_14px_0_rgba(0,0,0,0.39)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)] active:scale-95 duration-300">SIMPAN</button>
+                </div>
+                <div class="mb-4">
+                    <input type="text" id="searchStok" placeholder="🔍 Cari barang..." class="w-full px-6 py-4 rounded-2xl font-bold text-sm bg-white/80 backdrop-blur-xl border border-white/50 shadow-sm" onkeyup="searchTable('searchStok', 'inventoryBody')">
+                </div>
+                <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/50 overflow-x-auto shadow-xl">
+                    <table class="w-full text-left">
+                        <thead><tr class="border-b"><th>Nama Barang</th><th>Lokasi</th><th class="text-center">Stok</th><th class="text-right">Aksi</th></tr></thead>
+                        <tbody id="inventoryBody" class="divide-y divide-slate-50"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="page-user" class="page-content">
+                <div class="mb-4">
+                    <input type="text" id="searchUser" placeholder="🔍 Cari email user..." class="w-full px-6 py-4 rounded-2xl font-bold text-sm bg-white/80 backdrop-blur-xl border border-white/50 shadow-sm" onkeyup="searchTable('searchUser', 'userTableBody')">
+                </div>
+                <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/50 overflow-x-auto shadow-xl">
+                    <table class="w-full text-left">
+                        <thead><tr class="border-b"><th>Email User</th><th>Role</th><th class="text-right">Ubah Akses</th></tr></thead>
+                        <tbody id="userTableBody" class="divide-y divide-slate-50"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="page-history" class="page-content">
+                <div class="mb-4">
+                    <input type="text" id="searchHistory" placeholder="🔍 Cari aktivitas audit..." class="w-full px-6 py-4 rounded-2xl font-bold text-sm bg-white/80 backdrop-blur-xl border border-white/50 shadow-sm" onkeyup="searchTable('searchHistory', 'auditLogBody')">
+                </div>
+                <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/50 overflow-x-auto shadow-xl">
+                    <table class="w-full text-left">
+                        <thead><tr class="border-b"><th>Waktu</th><th>Pelaku</th><th class="text-center">Aksi</th><th class="text-center italic">Detail</th></tr></thead>
+                        <tbody id="auditLogBody" class="divide-y divide-slate-50"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="page-global" class="page-content">
+                <div class="mb-4">
+                    <input type="text" id="searchGlobal" placeholder="🔍 Cari nama barang, peminjam, atau status..." class="w-full px-6 py-4 rounded-2xl font-bold text-sm bg-white/80 backdrop-blur-xl border border-white/50 shadow-sm" onkeyup="searchTable('searchGlobal', 'logBody')">
+                </div>
+                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 border border-white/50 shadow-xl overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead><tr class="border-b"><th>Waktu</th><th>Peminjam</th><th class="text-center">Barang</th><th class="text-center">Status</th><th class="text-right">Bukti</th></tr></thead>
+                        <tbody id="logBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="page-stats" class="page-content">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 text-black">
+                    <div class="bg-indigo-50 p-8 rounded-[2.5rem] border border-indigo-100 shadow-sm">
+                        <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest italic">Total Pinjaman</p>
+                        <h3 id="stat-total-loans" class="text-5xl font-black mt-2">0</h3>
+                    </div>
+                    <div class="bg-emerald-50 p-8 rounded-[2.5rem] border border-emerald-100 shadow-sm">
+                        <p class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest italic">Barang Terlaris</p>
+                        <h3 id="stat-top-item" class="text-4xl font-black mt-2">-</h3>
+                    </div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/50 shadow-xl">
+                    <h3 class="font-bold text-slate-800 mb-6 italic uppercase text-sm tracking-tight">Grafik Frekuensi Peminjaman</h3>
+                    <canvas id="loanChart"></canvas>
+                </div>
+            </section>
         </div>
-
-    </aside>
-
-    <main class="flex-1 p-6 md:p-16 overflow-y-auto">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-            <h2 id="page-title" class="text-3xl font-extrabold italic tracking-tight uppercase text-slate-900">Dashboard</h2>
-            <p id="adminEmail" class="text-sm font-bold text-slate-500 italic"></p>
-        </div>
-
-        <section id="page-stok" class="page-content">
-            <div class="bg-indigo-600 p-8 rounded-[2.5rem] mb-10 flex flex-col md:flex-row gap-4 shadow-xl">
-                <input type="text" id="namaBarang" placeholder="Nama Barang..." class="flex-1 px-6 py-4 rounded-2xl outline-none font-bold">
-                <input type="number" id="stokBarang" placeholder="Qty" class="w-full md:w-24 px-6 py-4 rounded-2xl text-center font-bold">
-                <button id="btnAddItem" class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-black transition shadow-lg">SIMPAN</button>
-            </div>
-            <div class="bg-white rounded-3xl p-6 border border-slate-100 overflow-x-auto shadow-md">
-                <table class="w-full text-left">
-                    <thead><tr class="border-b"><th>Nama Barang</th><th class="text-center">Stok</th><th class="text-right">Aksi</th></tr></thead>
-                    <tbody id="inventoryBody" class="divide-y divide-slate-50"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="page-user" class="page-content">
-            <div class="bg-white rounded-3xl p-6 border border-slate-100 overflow-x-auto shadow-md">
-                <table class="w-full text-left">
-                    <thead><tr class="border-b"><th>Email User</th><th>Role</th><th class="text-right">Ubah Akses</th></tr></thead>
-                    <tbody id="userTableBody" class="divide-y divide-slate-50"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="page-history" class="page-content">
-            <div class="bg-white rounded-3xl p-6 border border-slate-100 overflow-x-auto shadow-md">
-                <table class="w-full text-left">
-                    <thead><tr class="border-b"><th>Waktu</th><th>Pelaku</th><th class="text-center">Aksi</th><th class="text-center italic">Detail</th></tr></thead>
-                    <tbody id="auditLogBody" class="divide-y divide-slate-50"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="page-global" class="page-content">
-            <div class="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-md overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead><tr class="border-b"><th>Waktu</th><th>Peminjam</th><th class="text-center">Barang</th><th class="text-center">Status</th><th class="text-right">Bukti</th></tr></thead>
-                    <tbody id="logBody" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-        </section>
     </main>
 
     <script type="module">
@@ -150,31 +157,29 @@
         import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc, query, orderBy, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBFX7SWWK8z0cQD3m4KNKjW3VCMbEjA_Tg",
-            authDomain: "testing-6b1d1.firebaseapp.com",
-            projectId: "testing-6b1d1",
-            storageBucket: "testing-6b1d1.firebasestorage.app",
-            messagingSenderId: "301829936342",
-            appId: "1:301829936342:web:4584de1f4740d4c978e577"
+            apiKey: "AIzaSyBFX7SWWK8z0cQD3m4KNKjW3VCMbEjA_Tg", authDomain: "testing-6b1d1.firebaseapp.com", projectId: "testing-6b1d1", storageBucket: "testing-6b1d1.firebasestorage.app", messagingSenderId: "301829936342", appId: "1:301829936342:web:4584de1f4740d4c978e577"
         };
+        const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
+        let globalRole = "", currentUserEmail = "", myChart = null;
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        let globalRole = "", currentUserEmail = "";
+        // UPGRADE 2: Konfigurasi Toast Custom
+        const Toast = Swal.mixin({
+            toast: true, position: "top-end", showConfirmButton: false, timer: 3000, timerProgressBar: true,
+            didOpen: (toast) => { toast.onmouseenter = Swal.stopTimer; toast.onmouseleave = Swal.resumeTimer; }
+        });
+
+        // Template Empty State (Kalo data kosong)
+        const emptyStateHTML = (pesan) => `<tr><td colspan="5"><div class="text-center py-10 opacity-50"><div class="text-4xl mb-3">📭</div><p class="font-bold text-slate-500 uppercase tracking-widest text-[10px]">${pesan}</p></div></td></tr>`;
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                currentUserEmail = user.email;
-                document.getElementById('adminEmail').innerText = user.email;
+                currentUserEmail = user.email; document.getElementById('adminEmail').innerText = user.email;
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists()) {
-                    globalRole = userDoc.data().role;
-                    document.getElementById('roleBadge').innerText = globalRole;
+                    globalRole = userDoc.data().role; document.getElementById('roleBadge').innerText = globalRole;
                     if (globalRole === 'admin') document.getElementById('btn-user').classList.remove('hidden');
-                    if (globalRole === 'admin' || globalRole === 'perlengkapan') {
-                        navTo('stok'); loadAllData();
-                    } else { window.location.href = "index.html"; }
+                    if (globalRole === 'admin' || globalRole === 'perlengkapan') { navTo('stok'); loadAllData(); } 
+                    else { window.location.href = "index.html"; }
                 }
             } else { window.location.href = "login.html"; }
         });
@@ -187,61 +192,89 @@
                 target.style.display = 'block';
                 const btn = document.getElementById('btn-' + id);
                 if(btn) btn.classList.add('nav-active');
-                document.getElementById('page-title').innerText = id === 'global' ? 'Log Peminjaman' : id.toUpperCase();
+                document.getElementById('page-title').innerText = id === 'global' ? 'Log Peminjaman' : (id === 'stats' ? 'Statistik' : id.toUpperCase());
+                if(id === 'stats') loadStatistics();
             }
-            if (window.innerWidth < 768) toggleSidebar();
+            if (window.innerWidth < 768) { const sb = document.getElementById('mainSidebar'); if(!sb.classList.contains('-translate-x-full')) toggleSidebar(); }
         };
 
         window.toggleSidebar = () => {
-            const sb = document.getElementById('mainSidebar');
-            sb.classList.toggle('-translate-x-full');
+            const sb = document.getElementById('mainSidebar'); sb.classList.toggle('-translate-x-full');
             document.getElementById('sidebarOverlay').style.display = sb.classList.contains('-translate-x-full') ? 'none' : 'block';
         };
 
-        async function loadAllData() {
-            loadInventory(); loadUsers(); loadAuditLogs(); loadLoanLogs();
-        }
+        window.searchTable = (inputId, tableBodyId) => {
+            const input = document.getElementById(inputId);
+            const filter = input.value.toLowerCase();
+            const tbody = document.getElementById(tableBodyId);
+            const tr = tbody.getElementsByTagName("tr");
+            
+            for (let i = 0; i < tr.length; i++) {
+                if (tr[i].innerText.includes("📭")) continue; // Skip empty state
+                let textValue = tr[i].textContent || tr[i].innerText;
+                if (textValue.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        };
+
+        async function loadAllData() { loadInventory(); loadUsers(); loadAuditLogs(); loadLoanLogs(); }
 
         async function loadInventory() {
             const snap = await getDocs(collection(db, "inventory"));
             const body = document.getElementById('inventoryBody'); body.innerHTML = "";
+            if(snap.empty) { body.innerHTML = emptyStateHTML("Belum ada barang di gudang"); return; }
             snap.forEach(d => {
-                body.innerHTML += `<tr><td class="p-5 uppercase font-bold text-black">${d.data().nama}</td><td class="p-5 text-center text-indigo-600 font-extrabold text-lg">${d.data().stok}</td><td class="p-5 text-right"><button onclick="deleteItem('${d.id}', '${d.data().nama}')" class="text-rose-500 font-bold text-[9px] uppercase tracking-widest hover:underline">Hapus</button></td></tr>`;
+                const lokasi = d.data().lokasi || "-";
+                body.innerHTML += `<tr><td class="p-5 uppercase font-bold text-black">${d.data().nama}</td><td class="p-5 text-slate-500 font-bold text-xs uppercase">${lokasi}</td><td class="p-5 text-center text-indigo-600 font-extrabold text-lg">${d.data().stok}</td><td class="p-5 text-right"><button onclick="deleteItem('${d.id}', '${d.data().nama}')" style="background-color: #e11d48; color: #ffffff;" class="px-4 py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest shadow-md hover:opacity-80 active:scale-95 transition">HAPUS</button></td></tr>`;
             });
         }
 
         document.getElementById('btnAddItem').onclick = async () => {
-            const nama = document.getElementById('namaBarang').value;
+            const nama = document.getElementById('namaBarang').value.trim();
+            const lokasi = document.getElementById('lokasiBarang').value.trim() || "-";
             const stok = parseInt(document.getElementById('stokBarang').value);
-            if(!nama || isNaN(stok)) return;
-            await addDoc(collection(db, "inventory"), { nama, stok });
-            await addDoc(collection(db, "logs_stok"), { waktu: serverTimestamp(), pelaku: currentUserEmail, aksi: "TAMBAH", detail: `${nama} (${stok})` });
+            if(!nama || isNaN(stok) || stok < 0) return Swal.fire('Error', 'Input kaga valid!', 'error');
+            
+            await addDoc(collection(db, "inventory"), { nama, stok, lokasi });
+            await addDoc(collection(db, "logs_stok"), { waktu: serverTimestamp(), pelaku: currentUserEmail, aksi: "TAMBAH", detail: `${nama} (${stok}) di ${lokasi}` });
             loadInventory(); loadAuditLogs();
-            document.getElementById('namaBarang').value = ""; document.getElementById('stokBarang').value = "";
+            document.getElementById('namaBarang').value = ""; document.getElementById('lokasiBarang').value = ""; document.getElementById('stokBarang').value = "";
+            // UPGRADE 3: Pake Toast Notif
+            Toast.fire({ icon: 'success', title: 'Barang berhasil ditambah!' });
         };
 
         window.deleteItem = async (id, nm) => {
-            if(confirm(`Hapus ${nm}?`)) {
+            const result = await Swal.fire({ title: `Hapus ${nm}?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#e11d48', confirmButtonText: 'Ya, Hapus!' });
+            if(result.isConfirmed) {
                 await deleteDoc(doc(db, "inventory", id));
                 await addDoc(collection(db, "logs_stok"), { waktu: serverTimestamp(), pelaku: currentUserEmail, aksi: "HAPUS", detail: nm });
-                loadInventory(); loadAuditLogs();
+                loadInventory(); loadAuditLogs(); 
+                Toast.fire({ icon: 'success', title: 'Barang dihapus!' });
             }
         };
 
         async function loadUsers() {
             const snap = await getDocs(collection(db, "users"));
             const body = document.getElementById('userTableBody'); body.innerHTML = "";
+            if(snap.empty) { body.innerHTML = emptyStateHTML("Belum ada user"); return; }
             snap.forEach(d => {
                 const r = d.data().role || "user";
                 body.innerHTML += `<tr><td class="p-5 font-bold text-black">${d.data().email}</td><td><span class="px-2 py-1 rounded-lg text-[9px] font-extrabold uppercase ${r === 'admin' ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}">${r}</span></td><td class="text-right"><select onchange="updateRole('${d.id}', this.value)" class="text-[9px] border p-2 rounded-lg text-black bg-white"><option value="">--</option><option value="user">User</option><option value="perlengkapan">Perlengkapan</option><option value="admin">Admin</option></select></td></tr>`;
             });
         }
 
-        window.updateRole = async (id, r) => { if(!r) return; await updateDoc(doc(db, "users", id), { role: r }); loadUsers(); };
+        window.updateRole = async (id, r) => { 
+            if(!r) return; await updateDoc(doc(db, "users", id), { role: r }); 
+            loadUsers(); Toast.fire({ icon: 'info', title: 'Akses user diubah!' }); 
+        };
 
         async function loadAuditLogs() {
             const body = document.getElementById('auditLogBody'); body.innerHTML = "";
-            const snap = await getDocs(collection(db, "logs_stok"));
+            const snap = await getDocs(query(collection(db, "logs_stok"), orderBy("waktu", "desc")));
+            if(snap.empty) { body.innerHTML = emptyStateHTML("Belum ada aktivitas"); return; }
             snap.forEach(d => {
                 const t = d.data().waktu?.toDate().toLocaleString() || '-';
                 body.innerHTML += `<tr><td class="p-4 italic text-slate-500 text-xs">${t}</td><td class="p-4 text-black text-xs">${d.data().pelaku}</td><td class="p-4 text-center font-bold text-xs ${d.data().aksi === 'TAMBAH' ? 'text-emerald-600' : 'text-rose-600'}">${d.data().aksi}</td><td class="p-4 italic text-center text-black text-xs">${d.data().detail}</td></tr>`;
@@ -249,15 +282,31 @@
         }
 
         async function loadLoanLogs() {
-            onSnapshot(collection(db, "loans"), (snap) => {
+            onSnapshot(query(collection(db, "loans"), orderBy("waktu_pinjam", "desc")), (snap) => {
                 const body = document.getElementById('logBody'); body.innerHTML = "";
+                if(snap.empty) { body.innerHTML = emptyStateHTML("Belum ada peminjaman"); return; }
                 snap.forEach(docSnap => {
                     const d = docSnap.data();
                     const t = d.waktu_pinjam?.toDate().toLocaleString() || '-';
-                    body.innerHTML += `<tr class="border-b border-slate-100"><td class="py-4 px-2 text-slate-500 italic text-xs">${t}</td><td class="py-4 px-2 uppercase font-bold text-black text-xs">${d.peminjam.split('@')[0]}</td><td class="py-4 px-2 text-center font-extrabold uppercase text-black text-xs">${d.barang} (x${d.jumlah})</td><td class="py-4 px-2 text-center uppercase tracking-widest font-bold text-xs ${d.status === 'kembali' ? 'text-emerald-600' : 'text-amber-600'}">${d.status}</td><td class="py-4 px-2 text-right">${d.foto_url ? `<a href="${d.foto_url}" target="_blank" class="text-indigo-600 font-bold hover:underline italic">[ BUKTI ]</a>` : '-'}</td></tr>`;
+                    const peminjamEmail = d.peminjam || 'Unknown';
+                    const peminjamName = peminjamEmail.includes('@') ? peminjamEmail.split('@')[0] : peminjamEmail;
+                    body.innerHTML += `<tr class="border-b border-slate-100"><td class="py-4 px-2 text-slate-500 italic text-xs">${t}</td><td class="py-4 px-2 uppercase font-bold text-black text-xs">${peminjamName}</td><td class="py-4 px-2 text-center font-extrabold uppercase text-black text-xs">${d.barang} (x${d.jumlah})</td><td class="py-4 px-2 text-center uppercase tracking-widest font-bold text-xs ${d.status === 'kembali' ? 'text-emerald-600' : 'text-amber-600'}">${d.status}</td><td class="py-4 px-2 text-right">${d.foto_url ? `<a href="${d.foto_url}" target="_blank" class="text-indigo-600 font-bold hover:underline italic">[ BUKTI ]</a>` : '-'}</td></tr>`;
                 });
             });
         }
+
+        async function loadStatistics() {
+            const snap = await getDocs(collection(db, "loans"));
+            const stats = {}; let total = 0;
+            snap.forEach(doc => { const b = doc.data().barang; stats[b] = (stats[b] || 0) + 1; total++; });
+            document.getElementById('stat-total-loans').innerText = total;
+            const sorted = Object.entries(stats).sort((a,b) => b[1] - a[1]);
+            document.getElementById('stat-top-item').innerText = sorted.length > 0 ? sorted[0][0] : "-";
+            const ctx = document.getElementById('loanChart').getContext('2d');
+            if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(stats), datasets: [{ label: 'Kali Dipinjam', data: Object.values(stats), backgroundColor: '#4f46e5', borderRadius: 10 }] }, options: { responsive: true, scales: { y: { beginAtZero: true } } } });
+        }
+
         document.getElementById('btnLogout').onclick = () => signOut(auth);
     </script>
 </body>

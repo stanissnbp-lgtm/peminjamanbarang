@@ -7,15 +7,44 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-slate-50 flex items-center justify-center min-h-screen p-6 font-['Plus_Jakarta_Sans']">
-    <div class="w-full max-w-md bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-100">
+<body class="bg-slate-50 relative overflow-hidden flex items-center justify-center min-h-screen p-6 font-['Plus_Jakarta_Sans']">
+    <!-- Animated Background Blobs -->
+    <div class="absolute top-0 -left-4 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
+    <div class="absolute top-0 -right-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob" style="animation-delay: 2s;"></div>
+    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob" style="animation-delay: 4s;"></div>
+
+    <div class="relative w-full max-w-md bg-white/80 backdrop-blur-xl p-10 rounded-[2.5rem] shadow-2xl border border-white/50 opacity-0 animate-fade-in-up">
         <h1 class="text-3xl font-extrabold text-slate-900 mb-2 italic">Daftar Akun<span class="text-indigo-600">.</span></h1>
         <p class="text-slate-400 text-sm mb-8 font-medium italic uppercase tracking-widest text-[10px]">Buat akun dulu yaa</p>
         <div class="space-y-4">
-            <input type="email" id="email" placeholder="Email aktif..." class="w-full px-6 py-4 bg-slate-50 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition text-sm">
-            <input type="password" id="pass" placeholder="Password (min 6 char)" class="w-full px-6 py-4 bg-slate-50 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition text-sm">
-            <button id="btnReg" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-extrabold shadow-lg hover:bg-indigo-700 transition active:scale-95">DAFTAR SEKARANG</button>
+            <input type="email" id="email" placeholder="Email aktif..." class="w-full px-6 py-4 bg-slate-100/50 hover:bg-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all duration-300 text-sm border border-transparent focus:border-indigo-300">
+            <input type="password" id="pass" placeholder="Password (min 6 char)" class="w-full px-6 py-4 bg-slate-100/50 hover:bg-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all duration-300 text-sm border border-transparent focus:border-indigo-300">
+            <button id="btnReg" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-extrabold shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:bg-indigo-700 transition-all duration-300 active:scale-95 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed">DAFTAR SEKARANG</button>
         </div>
         <p class="text-center text-xs text-slate-500 mt-8 font-medium">Udah punya akun? <a href="login.html" class="text-indigo-600 font-bold hover:underline italic">Login di sini</a></p>
     </div>
@@ -37,16 +66,26 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        document.getElementById('btnReg').onclick = async () => {
+        const btnReg = document.getElementById('btnReg');
+        btnReg.onclick = async () => {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
             if(!email || pass.length < 6) return Swal.fire('Error', 'Email/Pass kaga valid!', 'error');
+
+            const originalText = btnReg.innerHTML;
+            btnReg.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> MEMPROSES...';
+            btnReg.disabled = true;
 
             try {
                 const cred = await createUserWithEmailAndPassword(auth, email, pass);
                 await setDoc(doc(db, "users", cred.user.uid), { email, role: "user" });
                 Swal.fire('Berhasil!', 'Akun siap, otomatis masuk dashboard.', 'success').then(() => window.location.href = 'index.html');
-            } catch (e) { Swal.fire('Gagal!', e.message, 'error'); }
+            } catch (e) { 
+                Swal.fire('Gagal!', e.message, 'error'); 
+            } finally {
+                btnReg.innerHTML = originalText;
+                btnReg.disabled = false;
+            }
         };
     </script>
 </body>

@@ -7,30 +7,73 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }</style>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
+        .sticky-header { position: sticky; top: 0; z-index: 50; background-color: rgba(248, 250, 252, 0.85); backdrop-filter: blur(12px); padding-top: 1.5rem; padding-bottom: 1rem; margin-top: -1.5rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 2.5rem; }
+        
+        /* Animasi Transisi */
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="p-6 md:p-12">
-    <div class="max-w-4xl mx-auto">
-        <header class="flex justify-between items-end mb-10">
+<body class="p-6 md:p-12 relative overflow-x-hidden min-h-screen">
+    <!-- Animated Background Blobs -->
+    <div class="fixed top-0 -left-4 w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob pointer-events-none -z-10"></div>
+    <div class="fixed top-0 -right-4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob pointer-events-none -z-10" style="animation-delay: 2s;"></div>
+    <div class="fixed -bottom-8 left-20 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob pointer-events-none -z-10" style="animation-delay: 4s;"></div>
+
+    <div class="max-w-4xl mx-auto fade-in relative z-10">
+        <header class="sticky-header flex justify-between items-end">
             <div>
                 <h1 class="text-4xl font-extrabold text-slate-900 italic tracking-tighter">Misdinar<span class="text-indigo-600">.</span></h1>
                 <p id="userEmailDisplay" class="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-widest italic">MEMUAT PROFIL...</p>
             </div>
             <div class="flex gap-3">
-                <a href="admin.html" id="adminBtn" class="hidden bg-white border px-5 py-3 rounded-2xl text-slate-700 font-bold text-xs flex items-center gap-2 hover:bg-slate-50 transition shadow-sm">⚡ Panel Kontrol</a>
+                <a href="admin.html" id="adminBtn" class="hidden bg-white border px-5 py-3 rounded-2xl text-slate-700 font-bold text-xs flex items-center gap-2 hover:bg-slate-50 transition shadow-sm">⚡ Panel Admin</a>
                 <button id="btnLogout" class="bg-rose-50 text-rose-600 px-5 py-3 rounded-2xl font-bold text-xs hover:bg-rose-100 transition">Keluar</button>
             </div>
         </header>
 
-        <div class="bg-white rounded-[2.5rem] p-8 mb-10 shadow-xl shadow-slate-200/50 border border-slate-100">
+        <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 mb-10 shadow-xl shadow-slate-200/50 border border-white/50">
             <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3 italic">🛒 Keranjang Pinjaman</h2>
-            <div class="flex flex-col md:flex-row gap-4">
-                <select id="barangSelect" class="flex-1 px-6 py-4 bg-slate-50 border-none rounded-2xl outline-none focus:ring-4 focus:ring-indigo-100 font-bold transition text-sm"></select>
-                <input type="number" id="jumlahInput" value="1" min="1" class="w-full md:w-24 px-6 py-4 bg-slate-50 border-none rounded-2xl outline-none text-center font-bold">
-                <button id="btnTambahKeranjang" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 active:scale-95 transition">TAMBAHKAN</button>
+            
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <select id="barangSelect" class="flex-1 px-6 py-4 bg-slate-100/50 hover:bg-slate-100 border border-transparent rounded-2xl outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-300 font-bold transition-all duration-300 text-sm uppercase"></select>
+                    <input type="number" id="jumlahInput" value="1" min="1" class="w-full md:w-24 px-6 py-4 bg-slate-100/50 hover:bg-slate-100 border border-transparent rounded-2xl outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-300 text-center font-bold transition-all duration-300">
+                    <button id="btnTambahKeranjang" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold shadow-[0_4px_14px_0_rgba(0,0,0,0.39)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)] hover:bg-black active:scale-95 transition-all duration-300">TAMBAHKAN</button>
+                </div>
+                
+                <div id="infoBarangBox" class="hidden p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex flex-col md:flex-row justify-between items-center gap-3">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">📍 Lokasi: <span id="infoLokasi" class="text-indigo-600 font-black">-</span></p>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">📦 Tersedia: <span id="infoStok" class="text-emerald-600 font-black text-lg">-</span></p>
+                </div>
             </div>
-            <div id="cartItems" class="my-6 space-y-3 py-4 border-y border-slate-50"><p class="text-center text-slate-400 text-xs italic uppercase">Keranjang kosong.</p></div>
-            <button id="btnCheckout" class="hidden w-full bg-indigo-600 text-white py-5 rounded-2xl font-extrabold shadow-lg hover:bg-indigo-700 tracking-widest text-sm transition uppercase">Kirim Peminjaman</button>
+
+            <div id="cartItems" class="my-6 space-y-3 py-4 border-y border-slate-50"></div>
+            <button id="btnCheckout" class="hidden w-full bg-indigo-600 text-white py-5 rounded-2xl font-extrabold shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:bg-indigo-700 tracking-widest text-sm transition-all duration-300 uppercase active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed">Kirim Peminjaman</button>
         </div>
 
         <h2 class="text-2xl font-extrabold text-slate-800 mb-6 italic px-2 tracking-tight">Riwayat Pinjaman Saya</h2>
@@ -40,7 +83,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, getDoc, query, orderBy, onSnapshot, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, getDoc, query, orderBy, onSnapshot, serverTimestamp, where, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFX7SWWK8z0cQD3m4KNKjW3VCMbEjA_Tg",
@@ -54,11 +97,19 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // GANTI API KEY INI DENGAN PUNYA LU DARI IMGBB
         const IMGBB_API_KEY = "b98e99b09ca7f31c0becea92dcca332a";
 
         let currentUserEmail = "";
         let cart = [];
+
+        // Konfigurasi Toast Custom Profesional
+        const Toast = Swal.mixin({
+            toast: true, position: "top-end", showConfirmButton: false, timer: 3000, timerProgressBar: true,
+            didOpen: (toast) => { toast.onmouseenter = Swal.stopTimer; toast.onmouseleave = Swal.resumeTimer; }
+        });
+
+        const emptyStateCart = `<div class="text-center py-6 opacity-50"><div class="text-3xl mb-2">🛒</div><p class="font-bold text-slate-500 uppercase tracking-widest text-[10px]">Keranjang masih kosong</p></div>`;
+        const emptyStateHistory = `<div class="col-span-1 md:col-span-2 text-center py-10 opacity-50"><div class="text-4xl mb-3">📭</div><p class="font-bold text-slate-500 uppercase tracking-widest text-[10px]">Belum ada riwayat peminjaman</p></div>`;
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'login.html'; } else {
@@ -68,129 +119,174 @@
                 if (userDoc.exists() && (userDoc.data().role === 'admin' || userDoc.data().role === 'perlengkapan')) {
                     document.getElementById('adminBtn').classList.remove('hidden');
                 }
-                loadInventory(); initLoansRealtime();
+                loadInventory(); initLoansRealtime(); renderCart();
             }
         });
 
         async function loadInventory() {
             const snap = await getDocs(collection(db, "inventory"));
             const select = document.getElementById('barangSelect');
-            select.innerHTML = '<option value="">Pilih Barang...</option>';
-            snap.forEach(d => select.innerHTML += `<option value="${d.data().nama}" data-stok="${d.data().stok}">${d.data().nama} (Sisa: ${d.data().stok})</option>`);
+            select.innerHTML = '<option value="">PILIH BARANG...</option>';
+            snap.forEach(d => {
+                const data = d.data();
+                const lokasi = data.lokasi && data.lokasi !== "-" ? data.lokasi : "Belum Diatur";
+                select.innerHTML += `<option value="${data.nama}" data-stok="${data.stok}" data-lokasi="${lokasi}">${data.nama}</option>`;
+            });
         }
+
+        document.getElementById('barangSelect').addEventListener('change', function() {
+            const box = document.getElementById('infoBarangBox');
+            if (this.value === "") {
+                box.classList.add('hidden');
+            } else {
+                const opt = this.options[this.selectedIndex];
+                document.getElementById('infoLokasi').innerText = opt.getAttribute('data-lokasi');
+                document.getElementById('infoStok').innerText = opt.getAttribute('data-stok');
+                box.classList.remove('hidden');
+            }
+        });
 
         document.getElementById('btnTambahKeranjang').onclick = () => {
             const select = document.getElementById('barangSelect');
             const barang = select.value;
             const jumlah = parseInt(document.getElementById('jumlahInput').value);
             const stokTersedia = parseInt(select.options[select.selectedIndex]?.getAttribute('data-stok') || 0);
-            if(!barang || jumlah <= 0 || jumlah > stokTersedia) return Swal.fire('Error', 'Cek stok, jing!', 'error');
-            cart.push({ barang, jumlah }); renderCart();
+            
+            if(!barang) return Swal.fire('Gagal', 'Silakan pilih barang terlebih dahulu.', 'warning');
+            if(jumlah <= 0 || jumlah > stokTersedia) return Swal.fire('Gagal', 'Jumlah melebihi stok yang tersedia.', 'error');
+            if(cart.find(i => i.barang === barang)) return Swal.fire('Gagal', 'Barang ini sudah ada di keranjang.', 'warning');
+            
+            cart.push({ barang, jumlah }); 
+            renderCart();
+            Toast.fire({ icon: 'success', title: 'Ditambahkan ke keranjang' });
+            
+            select.value = "";
+            document.getElementById('infoBarangBox').classList.add('hidden');
+            document.getElementById('jumlahInput').value = 1;
         };
 
         function renderCart() {
             const container = document.getElementById('cartItems');
             const btn = document.getElementById('btnCheckout');
-            container.innerHTML = cart.length === 0 ? '<p class="text-center text-slate-400 text-xs italic">Keranjang kosong.</p>' : '';
+            container.innerHTML = cart.length === 0 ? emptyStateCart : '';
             cart.forEach((item, index) => {
-                container.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100"><span class="font-bold text-slate-700 text-sm">${item.barang} <span class="text-indigo-600">x${item.jumlah}</span></span><button onclick="removeItem(${index})" class="text-rose-500 font-bold text-[10px] uppercase tracking-widest hover:underline">Batal</button></div>`;
+                container.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100 fade-in"><span class="font-bold text-slate-700 text-sm">${item.barang} <span class="text-indigo-600">x${item.jumlah}</span></span><button onclick="removeItem(${index})" class="text-rose-500 font-bold text-[10px] uppercase tracking-widest hover:underline">Batal</button></div>`;
             });
             cart.length > 0 ? btn.classList.remove('hidden') : btn.classList.add('hidden');
         }
         window.removeItem = (i) => { cart.splice(i, 1); renderCart(); };
 
         document.getElementById('btnCheckout').onclick = async () => {
-            Swal.fire({ title: 'Memproses...', didOpen: () => Swal.showLoading() });
+            const btn = document.getElementById('btnCheckout');
+            btn.disabled = true; btn.innerText = "MEMPROSES...";
+            Swal.fire({ title: 'Memproses Transaksi...', text: 'Mohon tunggu sebentar', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
             try {
-                for (const item of cart) {
-                    const q = query(collection(db, "inventory"), where("nama", "==", item.barang));
-                    const snapInv = await getDocs(q);
-                    const invDoc = snapInv.docs[0];
-                    await updateDoc(invDoc.ref, { stok: invDoc.data().stok - item.jumlah });
-                    await addDoc(collection(db, "loans"), { peminjam: currentUserEmail, barang: item.barang, jumlah: item.jumlah, status: "dipinjam", waktu_pinjam: serverTimestamp(), laporan: "", foto_url: "" });
-                }
-                cart = []; renderCart(); loadInventory(); Swal.fire('Berhasil!', 'Pinjaman dikirim.', 'success');
-            } catch (e) { Swal.fire('Error', e.message, 'error'); }
+                await runTransaction(db, async (transaction) => {
+                    const writes = []; 
+                    for (const item of cart) {
+                        const q = query(collection(db, "inventory"), where("nama", "==", item.barang));
+                        const snapInv = await getDocs(q);
+                        const invDoc = snapInv.docs[0];
+                        if (!invDoc) throw `Barang ${item.barang} tidak ditemukan dalam database.`;
+                        if (invDoc.data().stok < item.jumlah) throw `Stok ${item.barang} tidak mencukupi. Sisa stok: ${invDoc.data().stok}`;
+                        writes.push({ ref: invDoc.ref, newStok: invDoc.data().stok - item.jumlah, item: item });
+                    }
+                    const groupId = Date.now().toString();
+                    writes.forEach(w => {
+                        transaction.update(w.ref, { stok: w.newStok });
+                        const newLoanRef = doc(collection(db, "loans"));
+                        transaction.set(newLoanRef, { peminjam: currentUserEmail, barang: w.item.barang, jumlah: w.item.jumlah, status: "dipinjam", waktu_pinjam: serverTimestamp(), laporan: "", foto_url: "", groupId: groupId });
+                    });
+                });
+                cart = []; renderCart(); loadInventory(); 
+                Swal.fire('Berhasil!', 'Peminjaman berhasil dicatat oleh sistem.', 'success');
+            } catch (e) { Swal.fire('Gagal Memproses', e.message || e, 'error'); } 
+            finally { btn.disabled = false; btn.innerText = "KIRIM PEMINJAMAN"; }
         };
 
         function initLoansRealtime() {
             onSnapshot(query(collection(db, "loans"), orderBy("waktu_pinjam", "desc")), (snap) => {
-                const list = document.getElementById('loanList'); list.innerHTML = "";
+                const list = document.getElementById('loanList'); 
+                list.innerHTML = "";
+                const groups = {};
+
                 snap.forEach(docSnap => {
                     const d = docSnap.data();
-                    if(d.peminjam === currentUserEmail) {
-                        const isDipinjam = d.status === "dipinjam";
-                        list.innerHTML += `<div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex justify-between items-center"><div><h3 class="font-bold text-slate-800 text-sm italic uppercase">${d.barang} (x${d.jumlah})</h3><p class="text-[9px] font-extrabold uppercase tracking-widest mt-1 ${isDipinjam ? 'text-amber-500' : 'text-emerald-500'}">${d.status}</p></div>${isDipinjam ? `<button onclick="kembalikanBarang('${docSnap.id}', '${d.barang}', ${d.jumlah})" class="bg-slate-900 text-white text-[10px] px-4 py-2 rounded-xl font-bold uppercase hover:bg-indigo-600 transition">Kembalikan</button>` : '✅'}</div>`;
+                    if(d.peminjam === currentUserEmail && d.status === "dipinjam") {
+                        const gid = d.groupId || docSnap.id; 
+                        if (!groups[gid]) groups[gid] = { items: [], waktu: d.waktu_pinjam };
+                        groups[gid].items.push({ id: docSnap.id, barang: d.barang, jumlah: d.jumlah });
                     }
                 });
+
+                const groupKeys = Object.keys(groups);
+                if (groupKeys.length === 0) {
+                    list.innerHTML = emptyStateHistory;
+                } else {
+                    groupKeys.forEach(gid => {
+                        const group = groups[gid];
+                        let title = group.items.map(i => `${i.barang} (x${i.jumlah})`).join(', ');
+                        const itemsStr = encodeURIComponent(JSON.stringify(group.items));
+                        list.innerHTML += `<div class="bg-white/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white/50 shadow-xl flex justify-between items-center fade-in w-full md:col-span-2"><div><h3 class="font-bold text-slate-800 text-sm italic uppercase">${title}</h3><p class="text-[9px] font-extrabold uppercase tracking-widest mt-1 text-amber-500">DIPINJAM</p></div><button onclick="kembalikanGrup('${itemsStr}')" class="bg-slate-900 text-white text-[10px] px-4 py-2 rounded-xl font-bold uppercase hover:bg-indigo-600 transition shadow-[0_4px_14px_0_rgba(0,0,0,0.39)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)] active:scale-95 duration-300">Kembalikan</button></div>`;
+                    });
+                }
             });
         }
 
-        window.kembalikanBarang = async (id, nama, jumlah) => {
+        window.kembalikanGrup = async (encodedItems) => {
+            const items = JSON.parse(decodeURIComponent(encodedItems));
+            
+            let formHtml = '<div class="text-left space-y-4 max-h-[60vh] overflow-y-auto px-2">';
+            items.forEach((item, idx) => {
+                formHtml += `
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <h4 class="font-bold text-sm mb-2 text-indigo-600 italic">${item.barang} (x${item.jumlah})</h4>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Foto Bukti (Wajib)</label>
+                    <input type="file" id="file_${idx}" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 mb-3">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase block">Laporan Kondisi</label>
+                    <input type="text" id="lap_${idx}" class="swal2-input !mt-1 !text-sm" placeholder="Kondisi baik...">
+                </div>
+                `;
+            });
+            formHtml += '</div>';
+
             const { value: result } = await Swal.fire({
-                title: `Kembalikan ${nama}`,
-                html: `
-                    <div class="text-left space-y-3">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase">Pilih Foto Bukti (Galeri/Kamera)</label>
-                        <input type="file" id="swal-input-file" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase block mt-3">Laporan Kondisi</label>
-                        <input id="swal-input-lap" class="swal2-input" placeholder="Contoh: Aman/Rusak..." style="margin-top:0">
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: 'Kirim & Balikin',
+                title: `Pengembalian (${items.length} Barang)`,
+                html: formHtml,
+                showCancelButton: true, confirmButtonText: 'Proses Semua', cancelButtonText: 'Batal',
+                width: '600px',
                 preConfirm: () => {
-                    const file = document.getElementById('swal-input-file').files[0];
-                    const lap = document.getElementById('swal-input-lap').value.trim();
-                    if (!file) {
-                        Swal.showValidationMessage('Wajib pilih foto bukti!');
-                        return false;
+                    const results = [];
+                    for(let i=0; i<items.length; i++) {
+                        const file = document.getElementById(`file_${i}`).files[0];
+                        const lap = document.getElementById(`lap_${i}`).value.trim() || "Kondisi baik";
+                        if (!file) { Swal.showValidationMessage(`Mohon unggah foto untuk ${items[i].barang}`); return false; }
+                        results.push({ id: items[i].id, barang: items[i].barang, jumlah: items[i].jumlah, file, lap });
                     }
-                    return { file, lap };
+                    return results;
                 }
             });
 
             if (result) {
-                Swal.fire({ title: 'Lagi Upload...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
+                Swal.fire({ title: 'Memproses...', text: 'Mengunggah foto dan memperbarui data', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                 try {
-                    // Upload ke ImgBB
-                    const formData = new FormData();
-                    formData.append("image", result.file);
+                    for (const req of result) {
+                        const formData = new FormData(); formData.append("image", req.file);
+                        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+                        const data = await response.json();
+                        if (!data.success) throw new Error(`Gagal mengunggah foto untuk ${req.barang}`);
 
-                    const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                        method: "POST",
-                        body: formData
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        const downloadURL = data.data.url;
-
-                        // Update Firestore
-                        await updateDoc(doc(db, "loans", id), {
-                            status: "kembali",
-                            laporan: result.lap || "Ok",
-                            foto_url: downloadURL,
-                            waktu_kembali: serverTimestamp()
-                        });
-
-                        // Balikin Stok
-                        const qInv = query(collection(db, "inventory"), where("nama", "==", nama));
+                        await updateDoc(doc(db, "loans", req.id), { status: "kembali", laporan: req.lap, foto_url: data.data.url, waktu_kembali: serverTimestamp() });
+                        
+                        const qInv = query(collection(db, "inventory"), where("nama", "==", req.barang));
                         const snapInv = await getDocs(qInv);
-                        if (!snapInv.empty) {
-                            await updateDoc(snapInv.docs[0].ref, { stok: snapInv.docs[0].data().stok + jumlah });
-                        }
-
-                        loadInventory();
-                        Swal.fire('Berhasil!', 'Barang balik & foto tersimpan.', 'success');
-                    } else {
-                        throw new Error("Gagal upload ke ImgBB");
+                        if (!snapInv.empty) await updateDoc(snapInv.docs[0].ref, { stok: snapInv.docs[0].data().stok + req.jumlah });
                     }
-                } catch (e) {
-                    Swal.fire('Error', e.message, 'error');
-                }
+                    
+                    loadInventory(); 
+                    Swal.fire('Berhasil!', 'Semua barang telah dikembalikan.', 'success');
+                } catch (e) { Swal.fire('Gagal Memproses', e.message, 'error'); }
             }
         };
         document.getElementById('btnLogout').onclick = () => signOut(auth);
