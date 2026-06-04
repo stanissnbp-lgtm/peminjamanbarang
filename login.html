@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Misdinar Inventory</title>
+    <title>Masuk | Misdinar Inventory</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -39,30 +39,32 @@
     <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob" style="animation-delay: 4s;"></div>
 
     <div class="relative w-full max-w-md bg-white/80 backdrop-blur-xl p-10 rounded-[2.5rem] shadow-2xl border border-white/50 opacity-0 animate-fade-in-up">
-        <h1 class="text-3xl font-extrabold text-slate-900 mb-2 italic tracking-tighter">Login<span class="text-indigo-600">.</span></h1>
-        <p class="text-slate-400 text-sm mb-8 font-medium italic uppercase tracking-widest text-[10px]">Selamat datang kembali.</p>
+        <h1 class="text-3xl font-extrabold text-slate-900 mb-2 italic tracking-tighter">Masuk Akun<span class="text-indigo-600">.</span></h1>
+        <p class="text-slate-400 text-sm mb-8 font-medium italic uppercase tracking-widest text-[10px]">Silakan masuk untuk melanjutkan.</p>
         <div class="space-y-4">
-            <input type="email" id="email" placeholder="Email lu..." class="w-full px-6 py-4 bg-slate-100/50 hover:bg-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all duration-300 text-sm border border-transparent focus:border-indigo-300">
-            <input type="password" id="pass" placeholder="Password..." class="w-full px-6 py-4 bg-slate-100/50 hover:bg-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all duration-300 text-sm border border-transparent focus:border-indigo-300">
-            <button id="btnLogin" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-extrabold shadow-[0_4px_14px_0_rgba(0,0,0,0.39)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)] hover:bg-black transition-all duration-300 active:scale-95 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed">MASUK SEKARANG</button>
+            <input type="email" id="email" placeholder="Masukkan email aktif" class="w-full px-6 py-4 bg-slate-100/50 hover:bg-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all duration-300 text-sm border border-transparent focus:border-indigo-300">
+            <input type="password" id="pass" placeholder="Masukkan kata sandi" class="w-full px-6 py-4 bg-slate-100/50 hover:bg-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all duration-300 text-sm border border-transparent focus:border-indigo-300">
+            <button id="btnLogin" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-extrabold shadow-[0_4px_14px_0_rgba(0,0,0,0.39)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)] hover:bg-black transition-all duration-300 active:scale-95 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed">MASUK</button>
         </div>
         <div class="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4">
-            <button id="btnLupaPass" class="text-xs text-slate-500 font-bold hover:text-indigo-600 transition italic underline-offset-4 hover:underline">Lupa Password?</button>
-            <p class="text-xs text-slate-500 font-medium">Belum punya akun? <a href="register.html" class="text-indigo-600 font-bold hover:underline italic">Daftar dulu</a></p>
+            <button id="btnLupaPass" class="text-xs text-slate-500 font-bold hover:text-indigo-600 transition italic underline-offset-4 hover:underline">Lupa kata sandi?</button>
+            <p class="text-xs text-slate-500 font-medium">Belum memiliki akun? <a href="register.html" class="text-indigo-600 font-bold hover:underline italic">Daftar di sini</a></p>
         </div>
+        <p class="text-center text-xs text-slate-500 mt-5 font-medium">Memerlukan panduan? <a href="tutorial-user.html" class="text-indigo-600 font-bold hover:underline italic">Baca tutorial pengguna</a></p>
     </div>
 
+    <script src="./config.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBFX7SWWK8z0cQD3m4KNKjW3VCMbEjA_Tg",
-            authDomain: "testing-6b1d1.firebaseapp.com",
-            projectId: "testing-6b1d1",
-            storageBucket: "testing-6b1d1.firebasestorage.app",
-            messagingSenderId: "301829936342",
-            appId: "1:301829936342:web:4584de1f4740d4c978e577"
+            apiKey: window.ENV.FIREBASE_API_KEY,
+            authDomain: window.ENV.FIREBASE_AUTH_DOMAIN,
+            projectId: window.ENV.FIREBASE_PROJECT_ID,
+            storageBucket: window.ENV.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: window.ENV.FIREBASE_MESSAGING_SENDER_ID,
+            appId: window.ENV.FIREBASE_APP_ID
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -80,7 +82,7 @@
                 await signInWithEmailAndPassword(auth, email, pass);
                 window.location.href = 'index.html';
             } catch (e) { 
-                Swal.fire('Gagal!', 'Email atau password salah, jing!', 'error'); 
+                Swal.fire('Gagal!', 'Email atau kata sandi yang Anda masukkan tidak sesuai.', 'error'); 
             } finally {
                 btnLogin.innerHTML = originalText;
                 btnLogin.disabled = false;
@@ -89,19 +91,19 @@
 
         document.getElementById('btnLupaPass').onclick = async () => {
             const { value: email } = await Swal.fire({
-                title: 'Lupa Password?',
+                title: 'Lupa kata sandi?',
                 input: 'email',
                 inputLabel: 'Masukkan email Anda',
-                inputPlaceholder: 'Email aktif...',
+                inputPlaceholder: 'Masukkan email aktif',
                 showCancelButton: true,
-                confirmButtonText: 'Kirim Link Reset',
+                confirmButtonText: 'Kirim tautan reset',
                 cancelButtonText: 'Batal'
             });
             if (email) {
-                Swal.fire({ title: 'Memproses...', text: 'Mengirim link reset password', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                Swal.fire({ title: 'Memproses...', text: 'Mengirim tautan reset kata sandi', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                 try {
                     await sendPasswordResetEmail(auth, email);
-                    Swal.fire('Terkirim!', 'Silakan cek kotak masuk (atau spam) email Anda.', 'success');
+                    Swal.fire('Terkirim!', 'Silakan periksa kotak masuk atau folder spam email Anda.', 'success');
                 } catch (e) {
                     Swal.fire('Gagal!', e.message, 'error');
                 }

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial User | Misdinar Inventory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
+        .fade-in { animation: fadeIn 0.45s ease-out forwards; }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .step-line::before {
+            content: "";
+            position: absolute;
+            left: 1.25rem;
+            top: 3.5rem;
+            bottom: -1.5rem;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        .step-line:last-child::before { display: none; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800">
+    <div class="min-h-screen">
+        <header class="sticky top-0 z-50 border-b border-slate-200 bg-slate-50/90 backdrop-blur-xl">
+            <div class="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-5 md:flex-row md:items-end md:justify-between">
+                <div>
+                    <p class="text-[10px] font-extrabold uppercase tracking-[0.3em] text-indigo-500">Panduan Role User</p>
+                    <h1 class="mt-1 text-3xl font-extrabold italic tracking-tight text-slate-950 md:text-4xl">Tutorial Misdinar<span class="text-indigo-600">.</span></h1>
+                    <p class="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-500">Ikuti panduan ini untuk memakai fitur peminjaman barang dari awal sampai pengembalian.</p>
+                </div>
+                <nav class="flex flex-wrap gap-3">
+                    <a href="index.html" class="rounded-2xl bg-slate-900 px-5 py-3 text-xs font-extrabold uppercase tracking-widest text-white shadow-lg shadow-slate-300 transition hover:bg-black">Dashboard</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="mx-auto max-w-6xl px-6 py-10 fade-in">
+            <section class="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+                <a href="#mulai" class="rounded-[2rem] border border-white bg-white/85 p-6 shadow-xl shadow-slate-200/60 transition hover:-translate-y-1 hover:border-indigo-100">
+                    <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Bagian 01</p>
+                    <h2 class="mt-3 text-lg font-extrabold italic text-slate-900">Mulai Pakai Akun</h2>
+                    <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Daftar, masuk, dan buka dashboard peminjaman.</p>
+                </a>
+                <a href="#pinjam" class="rounded-[2rem] border border-white bg-white/85 p-6 shadow-xl shadow-slate-200/60 transition hover:-translate-y-1 hover:border-indigo-100">
+                    <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Bagian 02</p>
+                    <h2 class="mt-3 text-lg font-extrabold italic text-slate-900">Ajukan Peminjaman</h2>
+                    <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Pilih barang, tentukan jumlah, tujuan, lalu kirim transaksi.</p>
+                </a>
+                <a href="#riwayat" class="rounded-[2rem] border border-white bg-white/85 p-6 shadow-xl shadow-slate-200/60 transition hover:-translate-y-1 hover:border-indigo-100">
+                    <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Bagian 03</p>
+                    <h2 class="mt-3 text-lg font-extrabold italic text-slate-900">Cek Riwayat</h2>
+                    <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Pantau barang yang masih aktif dipinjam.</p>
+                </a>
+                <a href="#kembali" class="rounded-[2rem] border border-white bg-white/85 p-6 shadow-xl shadow-slate-200/60 transition hover:-translate-y-1 hover:border-indigo-100">
+                    <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Bagian 04</p>
+                    <h2 class="mt-3 text-lg font-extrabold italic text-slate-900">Kembalikan Barang</h2>
+                    <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Unggah foto bukti dan tulis laporan kondisi barang.</p>
+                </a>
+            </section>
+
+            <section id="mulai" class="mt-10 scroll-mt-32 rounded-[2.5rem] border border-white bg-white/85 p-6 shadow-xl shadow-slate-200/60 md:p-8">
+                <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                    <div>
+                        <p class="text-[10px] font-extrabold uppercase tracking-[0.3em] text-indigo-500">Langkah Awal</p>
+                        <h2 class="mt-2 text-2xl font-extrabold italic tracking-tight text-slate-950">1. Membuat dan Masuk Akun</h2>
+                    </div>
+                    <p class="max-w-xl text-sm font-semibold leading-6 text-slate-500">Gunakan email aktif agar akun mudah dipulihkan jika lupa kata sandi.</p>
+                </div>
+
+                <div class="mt-8 space-y-8">
+                    <article class="step-line relative flex gap-5">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-indigo-600 text-sm font-black text-white">1</div>
+                        <div>
+                            <h3 class="font-extrabold text-slate-900">Buka halaman daftar</h3>
+                            <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Isi email aktif dan kata sandi minimal 6 karakter, lalu tekan <span class="font-extrabold text-slate-700">Daftar</span>.</p>
+                        </div>
+                    </article>
+                    <article class="step-line relative flex gap-5">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-indigo-600 text-sm font-black text-white">2</div>
+                        <div>
+                            <h3 class="font-extrabold text-slate-900">Masuk ke website</h3>
+                            <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Setelah akun dibuat, masuk menggunakan email dan kata sandi. Jika lupa kata sandi, gunakan tombol <span class="font-extrabold text-slate-700">Lupa kata sandi?</span> untuk menerima tautan reset lewat email.</p>
+                        </div>
+                    </article>
+                    <article class="step-line relative flex gap-5">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-indigo-600 text-sm font-black text-white">3</div>
+                        <div>
+                            <h3 class="font-extrabold text-slate-900">Masuk ke dashboard user</h3>
+                            <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Setelah berhasil masuk, Anda akan diarahkan ke dashboard peminjaman. Di sana ada area <span class="font-extrabold text-slate-700">Keranjang Pinjaman</span> dan <span class="font-extrabold text-slate-700">Riwayat Pinjaman Saya</span>.</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section id="pinjam" class="mt-10 scroll-mt-32 rounded-[2.5rem] border border-white bg-white/85 p-6 shadow-xl shadow-slate-200/60 md:p-8">
+                <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                    <div>
+                        <p class="text-[10px] font-extrabold uppercase tracking-[0.3em] text-indigo-500">Peminjaman</p>
+                        <h2 class="mt-2 text-2xl font-extrabold italic tracking-tight text-slate-950">2. Mengajukan Peminjaman Barang</h2>
+                    </div>
+                    <p class="max-w-xl text-sm font-semibold leading-6 text-slate-500">Pastikan stok tersedia dan tujuan peminjaman sudah dipilih sebelum mengirim transaksi.</p>
+                </div>
+
+                <div class="mt-8 grid gap-5 md:grid-cols-2">
+                    <div class="rounded-[2rem] bg-slate-50 p-6">
+                        <h3 class="font-extrabold text-slate-900">Pilih barang</h3>
+                        <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Buka dropdown <span class="font-extrabold text-slate-700">Pilih Barang</span>. Setelah barang dipilih, website akan menampilkan lokasi penyimpanan dan stok yang tersedia.</p>
+                    </div>
+                    <div class="rounded-[2rem] bg-slate-50 p-6">
+                        <h3 class="font-extrabold text-slate-900">Isi jumlah</h3>
+                        <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Masukkan jumlah barang yang ingin dipinjam. Jumlah tidak boleh 0 dan tidak boleh melebihi stok yang tersedia.</p>
+                    </div>
+                    <div class="rounded-[2rem] bg-slate-50 p-6">
+                        <h3 class="font-extrabold text-slate-900">Tentukan tujuan</h3>
+                        <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Pilih tujuan peminjaman, yaitu <span class="font-extrabold text-slate-700">Latihan</span> atau <span class="font-extrabold text-slate-700">Misa</span>. Pengajuan tidak bisa dikirim kalau tujuan masih kosong.</p>
+                    </div>
+                    <div class="rounded-[2rem] bg-slate-50 p-6">
+                        <h3 class="font-extrabold text-slate-900">Tambahkan ke keranjang</h3>
+                        <p class="mt-2 text-sm font-semibold leading-6 text-slate-500">Klik <span class="font-extrabold text-slate-700">Tambahkan</span>. Jika ingin meminjam beberapa barang, ulangi langkah pilih barang sampai semua masuk keranjang.</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 rounded-[2rem] border border-indigo-100 bg-indigo-50 p-6">
+                    <h3 class="font-extrabold text-indigo-900">Sebelum menekan Kirim Peminjaman</h3>
+                    <ul class="mt-3 space-y-3 text-sm font-semibold leading-6 text-indigo-900/75">
+                        <li>Periksa ulang nama barang dan jumlah di keranjang.</li>
+                        <li>Klik <span class="font-extrabold">Batal</span> pada item keranjang jika ada barang yang salah.</li>
+                        <li>Tekan <span class="font-extrabold">Kirim Peminjaman</span> setelah semuanya benar. Stok barang akan langsung berkurang ketika transaksi berhasil.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="riwayat" class="mt-10 scroll-mt-32 rounded-[2.5rem] border border-white bg-white/85 p-6 shadow-xl shadow-slate-200/60 md:p-8">
+                <div>
+                    <p class="text-[10px] font-extrabold uppercase tracking-[0.3em] text-indigo-500">Pemantauan</p>
+                    <h2 class="mt-2 text-2xl font-extrabold italic tracking-tight text-slate-950">3. Melihat Riwayat Pinjaman</h2>
+                </div>
+                <div class="mt-6 grid gap-5 md:grid-cols-3">
+                    <div class="rounded-[2rem] bg-slate-50 p-6">
+                        <p class="text-sm font-semibold leading-6 text-slate-500">Bagian <span class="font-extrabold text-slate-700">Riwayat Pinjaman Saya</span> menampilkan barang yang masih berstatus dipinjam.</p>
+                    </div>
+                    <div class="rounded-[2rem] bg-slate-50 p-6">
+                        <p class="text-sm font-semibold leading-6 text-slate-500">Jika beberapa barang dikirim dalam satu transaksi, website akan mengelompokkannya dalam satu kartu riwayat.</p>
+                    </div>
+                    <div class="rounded-[2rem] bg-slate-50 p-6">
+                        <p class="text-sm font-semibold leading-6 text-slate-500">Barang yang sudah dikembalikan tidak lagi muncul di riwayat aktif user, tetapi tetap tersimpan di log admin.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="kembali" class="mt-10 scroll-mt-32 rounded-[2.5rem] border border-white bg-white/85 p-6 shadow-xl shadow-slate-200/60 md:p-8">
+                <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                    <div>
+                        <p class="text-[10px] font-extrabold uppercase tracking-[0.3em] text-indigo-500">Pengembalian</p>
+                        <h2 class="mt-2 text-2xl font-extrabold italic tracking-tight text-slate-950">4. Mengembalikan Barang</h2>
+                    </div>
+                    <p class="max-w-xl text-sm font-semibold leading-6 text-slate-500">Foto bukti wajib diunggah untuk setiap barang yang dikembalikan.</p>
+                </div>
+
+                <div class="mt-8 space-y-5">
+                    <div class="flex gap-4 rounded-[2rem] bg-slate-50 p-6">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-sm font-black text-white">1</span>
+                        <p class="text-sm font-semibold leading-6 text-slate-500">Di kartu riwayat, klik tombol <span class="font-extrabold text-slate-700">Kembalikan</span>.</p>
+                    </div>
+                    <div class="flex gap-4 rounded-[2rem] bg-slate-50 p-6">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-sm font-black text-white">2</span>
+                        <p class="text-sm font-semibold leading-6 text-slate-500">Upload foto bukti untuk tiap barang. Foto sebaiknya jelas, memperlihatkan barang, dan diambil saat barang sudah siap dikembalikan.</p>
+                    </div>
+                    <div class="flex gap-4 rounded-[2rem] bg-slate-50 p-6">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-sm font-black text-white">3</span>
+                        <p class="text-sm font-semibold leading-6 text-slate-500">Isi laporan kondisi, misalnya <span class="font-extrabold text-slate-700">Kondisi baik</span>, <span class="font-extrabold text-slate-700">Ada goresan</span>, atau catatan lain yang perlu diketahui admin.</p>
+                    </div>
+                    <div class="flex gap-4 rounded-[2rem] bg-slate-50 p-6">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-sm font-black text-white">4</span>
+                        <p class="text-sm font-semibold leading-6 text-slate-500">Klik <span class="font-extrabold text-slate-700">Proses Semua</span>. Setelah berhasil, status barang berubah menjadi kembali dan stok masuk lagi ke inventory.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mt-10 grid gap-5 md:grid-cols-2">
+                <div class="rounded-[2.5rem] border border-white bg-white/85 p-6 shadow-xl shadow-slate-200/60 md:p-8">
+                    <p class="text-[10px] font-extrabold uppercase tracking-[0.3em] text-rose-500">Kendala Umum</p>
+                    <h2 class="mt-2 text-2xl font-extrabold italic tracking-tight text-slate-950">Jika Ada Masalah</h2>
+                    <ul class="mt-5 space-y-3 text-sm font-semibold leading-6 text-slate-500">
+                        <li>Barang tidak muncul: stok mungkin habis atau barang ditandai hanya untuk gudang.</li>
+                        <li>Jumlah ditolak: kurangi jumlah sesuai stok yang tersedia.</li>
+                        <li>Foto gagal upload: pastikan koneksi internet stabil dan file yang dipilih adalah gambar.</li>
+                        <li>Tidak bisa masuk: periksa email, kata sandi, atau gunakan fitur lupa kata sandi.</li>
+                    </ul>
+                </div>
+                <div class="rounded-[2.5rem] border border-white bg-slate-900 p-6 text-white shadow-xl shadow-slate-300/70 md:p-8">
+                    <p class="text-[10px] font-extrabold uppercase tracking-[0.3em] text-indigo-300">Etika Peminjaman</p>
+                    <h2 class="mt-2 text-2xl font-extrabold italic tracking-tight">Gunakan Barang Dengan Tanggung Jawab</h2>
+                    <ul class="mt-5 space-y-3 text-sm font-semibold leading-6 text-slate-300">
+                        <li>Pinjam sesuai kebutuhan kegiatan.</li>
+                        <li>Kembalikan barang secepatnya setelah selesai dipakai.</li>
+                        <li>Laporkan kondisi barang dengan jujur saat pengembalian.</li>
+                        <li>Hubungi admin atau tim perlengkapan jika ada barang rusak, hilang, atau stok tidak sesuai.</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

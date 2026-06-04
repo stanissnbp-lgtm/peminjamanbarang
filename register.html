@@ -40,27 +40,29 @@
 
     <div class="relative w-full max-w-md bg-white/80 backdrop-blur-xl p-10 rounded-[2.5rem] shadow-2xl border border-white/50 opacity-0 animate-fade-in-up">
         <h1 class="text-3xl font-extrabold text-slate-900 mb-2 italic">Daftar Akun<span class="text-indigo-600">.</span></h1>
-        <p class="text-slate-400 text-sm mb-8 font-medium italic uppercase tracking-widest text-[10px]">Buat akun dulu yaa</p>
+        <p class="text-slate-400 text-sm mb-8 font-medium italic uppercase tracking-widest text-[10px]">Silakan buat akun untuk melanjutkan.</p>
         <div class="space-y-4">
-            <input type="email" id="email" placeholder="Email aktif..." class="w-full px-6 py-4 bg-slate-100/50 hover:bg-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all duration-300 text-sm border border-transparent focus:border-indigo-300">
-            <input type="password" id="pass" placeholder="Password (min 6 char)" class="w-full px-6 py-4 bg-slate-100/50 hover:bg-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all duration-300 text-sm border border-transparent focus:border-indigo-300">
-            <button id="btnReg" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-extrabold shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:bg-indigo-700 transition-all duration-300 active:scale-95 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed">DAFTAR SEKARANG</button>
+            <input type="email" id="email" placeholder="Masukkan email aktif" class="w-full px-6 py-4 bg-slate-100/50 hover:bg-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all duration-300 text-sm border border-transparent focus:border-indigo-300">
+            <input type="password" id="pass" placeholder="Masukkan kata sandi minimal 6 karakter" class="w-full px-6 py-4 bg-slate-100/50 hover:bg-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-all duration-300 text-sm border border-transparent focus:border-indigo-300">
+            <button id="btnReg" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-extrabold shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:bg-indigo-700 transition-all duration-300 active:scale-95 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed">DAFTAR</button>
         </div>
-        <p class="text-center text-xs text-slate-500 mt-8 font-medium">Udah punya akun? <a href="login.html" class="text-indigo-600 font-bold hover:underline italic">Login di sini</a></p>
+        <p class="text-center text-xs text-slate-500 mt-8 font-medium">Sudah memiliki akun? <a href="login.html" class="text-indigo-600 font-bold hover:underline italic">Masuk di sini</a></p>
+        <p class="text-center text-xs text-slate-500 mt-4 font-medium">Memerlukan panduan? <a href="tutorial-user.html" class="text-indigo-600 font-bold hover:underline italic">Lihat tutorial pengguna</a></p>
     </div>
 
+    <script src="./config.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBFX7SWWK8z0cQD3m4KNKjW3VCMbEjA_Tg",
-            authDomain: "testing-6b1d1.firebaseapp.com",
-            projectId: "testing-6b1d1",
-            storageBucket: "testing-6b1d1.firebasestorage.app",
-            messagingSenderId: "301829936342",
-            appId: "1:301829936342:web:4584de1f4740d4c978e577"
+            apiKey: window.ENV.FIREBASE_API_KEY,
+            authDomain: window.ENV.FIREBASE_AUTH_DOMAIN,
+            projectId: window.ENV.FIREBASE_PROJECT_ID,
+            storageBucket: window.ENV.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: window.ENV.FIREBASE_MESSAGING_SENDER_ID,
+            appId: window.ENV.FIREBASE_APP_ID
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -70,7 +72,7 @@
         btnReg.onclick = async () => {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
-            if(!email || pass.length < 6) return Swal.fire('Error', 'Email/Pass kaga valid!', 'error');
+            if(!email || pass.length < 6) return Swal.fire('Data tidak valid', 'Masukkan email aktif dan kata sandi minimal 6 karakter.', 'error');
 
             const originalText = btnReg.innerHTML;
             btnReg.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> MEMPROSES...';
@@ -79,7 +81,7 @@
             try {
                 const cred = await createUserWithEmailAndPassword(auth, email, pass);
                 await setDoc(doc(db, "users", cred.user.uid), { email, role: "user" });
-                Swal.fire('Berhasil!', 'Akun siap, otomatis masuk dashboard.', 'success').then(() => window.location.href = 'index.html');
+                Swal.fire('Berhasil!', 'Akun berhasil dibuat. Anda akan diarahkan ke dashboard.', 'success').then(() => window.location.href = 'index.html');
             } catch (e) { 
                 Swal.fire('Gagal!', e.message, 'error'); 
             } finally {

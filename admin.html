@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Console Admin | Misdinar Inventory</title>
-    <script src="https://unpkg.com/tailwindcss-jit-cdn"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #000000; margin: 0; }
@@ -79,18 +80,30 @@
             </div>
 
             <section id="page-stok" class="page-content">
-                <div class="bg-indigo-600/90 backdrop-blur-xl p-8 rounded-[2.5rem] mb-10 flex flex-col md:flex-row gap-4 shadow-2xl border border-indigo-400/30">
-                    <input type="text" id="namaBarang" placeholder="Nama Barang..." class="flex-1 px-6 py-4 rounded-2xl font-bold text-sm">
-                    <input type="text" id="lokasiBarang" placeholder="Lokasi (Laci 1...)" class="w-full md:w-40 px-6 py-4 rounded-2xl font-bold text-center text-sm">
-                    <input type="number" id="stokBarang" placeholder="Qty" class="w-full md:w-24 px-6 py-4 rounded-2xl text-center font-bold text-sm">
-                    <button id="btnAddItem" class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-black transition-all shadow-[0_4px_14px_0_rgba(0,0,0,0.39)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)] active:scale-95 duration-300">SIMPAN</button>
+                <div class="bg-indigo-600/90 backdrop-blur-xl p-8 rounded-[2.5rem] mb-10 shadow-2xl border border-indigo-400/30">
+                    <div class="flex flex-col md:flex-row gap-4 mb-4">
+                        <input type="text" id="namaBarang" placeholder="Nama Barang..." class="flex-1 px-6 py-4 rounded-2xl font-bold text-sm">
+                        <input type="text" id="lokasiBarang" placeholder="Lokasi (Laci 1...)" class="w-full md:w-40 px-6 py-4 rounded-2xl font-bold text-center text-sm">
+                        <input type="number" id="stokBarang" placeholder="Qty" class="w-full md:w-24 px-6 py-4 rounded-2xl text-center font-bold text-sm">
+                        <button id="btnAddItem" class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-black transition-all shadow-[0_4px_14px_0_rgba(0,0,0,0.39)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)] active:scale-95 duration-300">SIMPAN</button>
+                    </div>
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-indigo-700/50 p-4 rounded-2xl border border-indigo-500/30">
+                        <label class="flex items-center gap-3 text-white font-bold text-sm cursor-pointer">
+                            <input type="checkbox" id="bisaDipinjam" checked class="w-5 h-5 rounded border-indigo-400 text-indigo-500 focus:ring-indigo-500">
+                            Barang ini bisa dipinjam oleh user
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <input type="file" id="csvFileInput" accept=".csv, .xlsx, .xls" class="text-xs text-indigo-200 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-white transition cursor-pointer">
+                            <button id="btnImportCsv" class="bg-emerald-500 text-white px-4 py-2 rounded-xl font-bold text-xs uppercase hover:bg-emerald-400 transition shadow-lg flex items-center gap-2">📥 Import Data</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="mb-4">
                     <input type="text" id="searchStok" placeholder="🔍 Cari barang..." class="w-full px-6 py-4 rounded-2xl font-bold text-sm bg-white/80 backdrop-blur-xl border border-white/50 shadow-sm" onkeyup="searchTable('searchStok', 'inventoryBody')">
                 </div>
                 <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/50 overflow-x-auto shadow-xl">
                     <table class="w-full text-left">
-                        <thead><tr class="border-b"><th>Nama Barang</th><th>Lokasi</th><th class="text-center">Stok</th><th class="text-right">Aksi</th></tr></thead>
+                        <thead><tr class="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest"><th class="pb-4">Nama Barang</th><th class="pb-4">Lokasi</th><th class="pb-4 text-center">Stok</th><th class="pb-4 text-center">Status</th><th class="pb-4 text-right">Aksi</th></tr></thead>
                         <tbody id="inventoryBody" class="divide-y divide-slate-50"></tbody>
                     </table>
                 </div>
@@ -102,7 +115,7 @@
                 </div>
                 <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/50 overflow-x-auto shadow-xl">
                     <table class="w-full text-left">
-                        <thead><tr class="border-b"><th>Email User</th><th>Role</th><th class="text-right">Ubah Akses</th></tr></thead>
+                        <thead><tr class="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest"><th class="pb-4">Email User</th><th class="pb-4">Role</th><th class="pb-4 text-right">Ubah Akses</th></tr></thead>
                         <tbody id="userTableBody" class="divide-y divide-slate-50"></tbody>
                     </table>
                 </div>
@@ -114,7 +127,7 @@
                 </div>
                 <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/50 overflow-x-auto shadow-xl">
                     <table class="w-full text-left">
-                        <thead><tr class="border-b"><th>Waktu</th><th>Pelaku</th><th class="text-center">Aksi</th><th class="text-center italic">Detail</th></tr></thead>
+                        <thead><tr class="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest"><th class="pb-4">Waktu</th><th class="pb-4">Pelaku</th><th class="pb-4 text-center">Aksi</th><th class="pb-4 text-center italic">Detail</th></tr></thead>
                         <tbody id="auditLogBody" class="divide-y divide-slate-50"></tbody>
                     </table>
                 </div>
@@ -126,7 +139,7 @@
                 </div>
                 <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 border border-white/50 shadow-xl overflow-x-auto">
                     <table class="w-full text-left">
-                        <thead><tr class="border-b"><th>Waktu</th><th>Peminjam</th><th class="text-center">Barang</th><th class="text-center">Status</th><th class="text-right">Bukti</th></tr></thead>
+                        <thead><tr class="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest"><th class="pb-4">Waktu</th><th class="pb-4">Peminjam</th><th class="pb-4 text-center">Barang</th><th class="pb-4 text-center">Tujuan</th><th class="pb-4 text-center">Status</th><th class="pb-4 text-right">Bukti</th></tr></thead>
                         <tbody id="logBody" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
@@ -151,16 +164,22 @@
         </div>
     </main>
 
+    <script src="./config.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc, query, orderBy, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc, query, orderBy, serverTimestamp, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBFX7SWWK8z0cQD3m4KNKjW3VCMbEjA_Tg", authDomain: "testing-6b1d1.firebaseapp.com", projectId: "testing-6b1d1", storageBucket: "testing-6b1d1.firebasestorage.app", messagingSenderId: "301829936342", appId: "1:301829936342:web:4584de1f4740d4c978e577"
+            apiKey: window.ENV.FIREBASE_API_KEY, authDomain: window.ENV.FIREBASE_AUTH_DOMAIN, projectId: window.ENV.FIREBASE_PROJECT_ID, storageBucket: window.ENV.FIREBASE_STORAGE_BUCKET, messagingSenderId: window.ENV.FIREBASE_MESSAGING_SENDER_ID, appId: window.ENV.FIREBASE_APP_ID
         };
         const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
         let globalRole = "", currentUserEmail = "", myChart = null;
+
+        // Active Real-time Listeners Unsubscribe Functions
+        let unsubscribeInventory = null;
+        let unsubscribeUsers = null;
+        let unsubscribeAuditLogs = null;
 
         // UPGRADE 2: Konfigurasi Toast Custom
         const Toast = Swal.mixin({
@@ -220,15 +239,41 @@
             }
         };
 
-        async function loadAllData() { loadInventory(); loadUsers(); loadAuditLogs(); loadLoanLogs(); }
+        function loadAllData() { 
+            loadInventoryRealtime(); 
+            loadUsersRealtime(); 
+            loadAuditLogsRealtime(); 
+            loadLoanLogs(); 
+        }
 
-        async function loadInventory() {
-            const snap = await getDocs(collection(db, "inventory"));
-            const body = document.getElementById('inventoryBody'); body.innerHTML = "";
-            if(snap.empty) { body.innerHTML = emptyStateHTML("Belum ada barang di gudang"); return; }
-            snap.forEach(d => {
-                const lokasi = d.data().lokasi || "-";
-                body.innerHTML += `<tr><td class="p-5 uppercase font-bold text-black">${d.data().nama}</td><td class="p-5 text-slate-500 font-bold text-xs uppercase">${lokasi}</td><td class="p-5 text-center text-indigo-600 font-extrabold text-lg">${d.data().stok}</td><td class="p-5 text-right"><button onclick="deleteItem('${d.id}', '${d.data().nama}')" style="background-color: #e11d48; color: #ffffff;" class="px-4 py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest shadow-md hover:opacity-80 active:scale-95 transition">HAPUS</button></td></tr>`;
+        function loadInventoryRealtime() {
+            if (unsubscribeInventory) unsubscribeInventory();
+            unsubscribeInventory = onSnapshot(collection(db, "inventory"), (snap) => {
+                const body = document.getElementById('inventoryBody'); 
+                body.innerHTML = "";
+                if(snap.empty) { body.innerHTML = emptyStateHTML("Belum ada barang di gudang"); return; }
+                
+                const docs = [];
+                snap.forEach(d => docs.push(d));
+                docs.sort((a, b) => a.data().nama.localeCompare(b.data().nama));
+
+                docs.forEach(d => {
+                    const lokasi = d.data().lokasi || "-";
+                    const bisaPinjam = d.data().bisa_dipinjam !== false;
+                    
+                    const selectStatus = `<select onchange="updateItem('${d.id}', 'bisa_dipinjam', this.value === 'true')" title="Ubah Status" class="text-[9px] font-extrabold uppercase p-2 rounded-xl border border-slate-200 hover:border-indigo-400 focus:border-indigo-500 bg-slate-50 focus:bg-white transition cursor-pointer outline-none shadow-inner ${bisaPinjam ? 'text-emerald-700' : 'text-amber-700'}">
+                        <option value="true" ${bisaPinjam ? 'selected' : ''}>BISA DIPINJAM</option>
+                        <option value="false" ${!bisaPinjam ? 'selected' : ''}>GUDANG SAJA</option>
+                    </select>`;
+
+                    body.innerHTML += `<tr class="hover:bg-slate-50 transition group border-b border-slate-100">
+                        <td class="p-4 uppercase font-bold text-black">${d.data().nama}</td>
+                        <td class="p-4"><input type="text" value="${lokasi}" title="Edit Lokasi" onchange="updateItem('${d.id}', 'lokasi', this.value)" class="w-full max-w-[120px] text-xs font-bold text-slate-700 uppercase bg-slate-100 border border-slate-200 hover:border-indigo-400 focus:border-indigo-500 focus:bg-white rounded-xl px-3 py-2 transition outline-none shadow-inner cursor-text"></td>
+                        <td class="p-4 text-center"><input type="number" min="0" value="${d.data().stok}" title="Edit Stok" onchange="updateItem('${d.id}', 'stok', parseInt(this.value) || 0)" class="w-20 text-center text-lg font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-200 hover:border-indigo-400 focus:border-indigo-500 focus:bg-white rounded-xl px-2 py-2 transition outline-none shadow-inner cursor-text"></td>
+                        <td class="p-4 text-center">${selectStatus}</td>
+                        <td class="p-4 text-right"><button onclick="deleteItem('${d.id}', '${d.data().nama}')" class="bg-rose-100 text-rose-600 hover:bg-rose-600 hover:text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-widest transition active:scale-95 opacity-50 group-hover:opacity-100">HAPUS</button></td>
+                    </tr>`;
+                });
             });
         }
 
@@ -236,14 +281,157 @@
             const nama = document.getElementById('namaBarang').value.trim();
             const lokasi = document.getElementById('lokasiBarang').value.trim() || "-";
             const stok = parseInt(document.getElementById('stokBarang').value);
+            const bisaDipinjam = document.getElementById('bisaDipinjam').checked;
             if(!nama || isNaN(stok) || stok < 0) return Swal.fire('Error', 'Input kaga valid!', 'error');
             
-            await addDoc(collection(db, "inventory"), { nama, stok, lokasi });
-            await addDoc(collection(db, "logs_stok"), { waktu: serverTimestamp(), pelaku: currentUserEmail, aksi: "TAMBAH", detail: `${nama} (${stok}) di ${lokasi}` });
-            loadInventory(); loadAuditLogs();
-            document.getElementById('namaBarang').value = ""; document.getElementById('lokasiBarang').value = ""; document.getElementById('stokBarang').value = "";
-            // UPGRADE 3: Pake Toast Notif
+            await addDoc(collection(db, "inventory"), { nama, stok, lokasi, bisa_dipinjam: bisaDipinjam });
+            await addDoc(collection(db, "logs_stok"), { waktu: serverTimestamp(), pelaku: currentUserEmail, aksi: "TAMBAH", detail: `${nama} (${stok}) - ${bisaDipinjam ? 'Bisa Pinjam' : 'Gudang'}` });
+            document.getElementById('namaBarang').value = ""; document.getElementById('lokasiBarang').value = ""; document.getElementById('stokBarang').value = ""; document.getElementById('bisaDipinjam').checked = true;
             Toast.fire({ icon: 'success', title: 'Barang berhasil ditambah!' });
+        };
+
+        document.getElementById('btnImportCsv').onclick = () => {
+            const fileInput = document.getElementById('csvFileInput');
+            if(!fileInput.files.length) return Swal.fire('Gagal', 'Pilih file CSV/Excel dulu!', 'warning');
+            
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = async (e) => {
+                try {
+                    Swal.fire({ title: 'Mengimpor Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                    
+                    // Deteksi baris header secara dinamis
+                    let colNama = -1, colLokasi = -1, colStok = -1, colStatus = -1;
+                    let startRow = 0;
+                    
+                    for (let i = 0; i < Math.min(rows.length, 15); i++) {
+                        const row = rows[i];
+                        if (!row || row.length === 0) continue;
+                        
+                        let rowStr = row.map(c => String(c).toLowerCase()).join(' ');
+                        if (rowStr.includes('nama')) {
+                            startRow = i + 1; // Baris data mulai setelah header
+                            // Tentukan index setiap kolom
+                            for (let j = 0; j < row.length; j++) {
+                                let cell = String(row[j] || '').toLowerCase().trim();
+                                if (cell.includes('nama')) colNama = j;
+                                else if (cell.includes('tempat') || cell.includes('lokasi')) colLokasi = j;
+                                else if (cell.includes('jumlah') || cell.includes('stok') || cell.includes('qty')) colStok = j;
+                                else if (cell.includes('status') || cell.includes('kesiapan') || cell.includes('keterangan')) colStatus = j;
+                            }
+                            break;
+                        }
+                    }
+                    
+                    if (colNama === -1) {
+                        colNama = 0; colLokasi = 1; colStok = 2; startRow = 0;
+                    }
+
+                    // Get current inventory to perform name-based upsert
+                    const snapInv = await getDocs(collection(db, "inventory"));
+                    const invMap = {};
+                    snapInv.forEach(docSnap => {
+                        const d = docSnap.data();
+                        invMap[d.nama.toLowerCase().trim()] = {
+                            ref: docSnap.ref,
+                            stok: d.stok
+                        };
+                    });
+
+                    const operations = [];
+                    let count = 0;
+                    
+                    for(let i = startRow; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || row.length === 0) continue;
+                        
+                        let nama = row[colNama] ? String(row[colNama]).trim() : '';
+                        if (!nama || nama.toLowerCase() === 'nama peralatan') continue;
+                        
+                        let stok = 1;
+                        if (colStok !== -1 && row[colStok] !== undefined) {
+                            stok = parseInt(row[colStok]);
+                            if (isNaN(stok) || stok < 0) stok = 1;
+                        } else if (colNama === 0 && row.length > 2) {
+                            stok = !isNaN(parseInt(row[2])) ? parseInt(row[2]) : (!isNaN(parseInt(row[1])) ? parseInt(row[1]) : 1);
+                        }
+                        
+                        let lokasi = "-";
+                        if (colLokasi !== -1 && row[colLokasi] !== undefined) {
+                            lokasi = String(row[colLokasi]).trim();
+                        } else if (colNama === 0 && row.length > 1) {
+                            lokasi = isNaN(parseInt(row[1])) ? String(row[1]).trim() : (row.length > 2 ? String(row[2]).trim() : "-");
+                        }
+                        
+                        let bisa_dipinjam = true;
+                        if (colStatus !== -1 && row[colStatus] !== undefined) {
+                            let val = String(row[colStatus]).toLowerCase().trim();
+                            if (val.includes('rusak') || val.includes('hilang') || val.includes('tidak') || val.includes('gudang')) {
+                                bisa_dipinjam = false;
+                            }
+                        }
+                        
+                        if (!lokasi || lokasi === 'undefined') lokasi = "-";
+                        if (isNaN(stok) || stok < 0) stok = 1;
+                        
+                        const key = nama.toLowerCase().trim();
+                        if (invMap[key]) {
+                            const newStok = invMap[key].stok + stok;
+                            operations.push({
+                                type: "update",
+                                ref: invMap[key].ref,
+                                data: { stok: newStok }
+                            });
+                            invMap[key].stok = newStok; // update local map
+                        } else {
+                            const newRef = doc(collection(db, "inventory"));
+                            operations.push({
+                                type: "set",
+                                ref: newRef,
+                                data: { nama, stok, lokasi, bisa_dipinjam }
+                            });
+                            invMap[key] = { ref: newRef, stok: stok }; // update local map
+                        }
+                        count++;
+                    }
+
+                    // Execute batch in chunks of 400
+                    const chunkSize = 400;
+                    for (let i = 0; i < operations.length; i += chunkSize) {
+                        const batch = writeBatch(db);
+                        const chunk = operations.slice(i, i + chunkSize);
+                        chunk.forEach(op => {
+                            if (op.type === "update") {
+                                batch.update(op.ref, op.data);
+                            } else if (op.type === "set") {
+                                batch.set(op.ref, op.data);
+                            }
+                        });
+                        await batch.commit();
+                    }
+                    
+                    if(count > 0) {
+                        await addDoc(collection(db, "logs_stok"), { waktu: serverTimestamp(), pelaku: currentUserEmail, aksi: "IMPORT FILE", detail: `${count} item diproses` });
+                        Swal.fire('Berhasil', `${count} barang berhasil diproses!`, 'success');
+                    } else {
+                        Swal.fire('Gagal Impor', `Tidak ada data barang yang valid untuk diimpor. Pastikan format tabel benar.`, 'error');
+                    }
+                    fileInput.value = '';
+                } catch (error) {
+                    Swal.fire('Gagal Impor', `Terjadi kesalahan saat membaca file: ${error.message}`, 'error');
+                }
+            };
+            
+            reader.readAsArrayBuffer(file);
         };
 
         window.deleteItem = async (id, nm) => {
@@ -251,33 +439,50 @@
             if(result.isConfirmed) {
                 await deleteDoc(doc(db, "inventory", id));
                 await addDoc(collection(db, "logs_stok"), { waktu: serverTimestamp(), pelaku: currentUserEmail, aksi: "HAPUS", detail: nm });
-                loadInventory(); loadAuditLogs(); 
                 Toast.fire({ icon: 'success', title: 'Barang dihapus!' });
             }
         };
 
-        async function loadUsers() {
-            const snap = await getDocs(collection(db, "users"));
-            const body = document.getElementById('userTableBody'); body.innerHTML = "";
-            if(snap.empty) { body.innerHTML = emptyStateHTML("Belum ada user"); return; }
-            snap.forEach(d => {
-                const r = d.data().role || "user";
-                body.innerHTML += `<tr><td class="p-5 font-bold text-black">${d.data().email}</td><td><span class="px-2 py-1 rounded-lg text-[9px] font-extrabold uppercase ${r === 'admin' ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}">${r}</span></td><td class="text-right"><select onchange="updateRole('${d.id}', this.value)" class="text-[9px] border p-2 rounded-lg text-black bg-white"><option value="">--</option><option value="user">User</option><option value="perlengkapan">Perlengkapan</option><option value="admin">Admin</option></select></td></tr>`;
+        window.updateItem = async (id, field, val) => {
+            await updateDoc(doc(db, "inventory", id), { [field]: val });
+            let detailLog = field === 'bisa_dipinjam' ? (val ? 'Bisa Dipinjam' : 'Gudang Saja') : val;
+            await addDoc(collection(db, "logs_stok"), { waktu: serverTimestamp(), pelaku: currentUserEmail, aksi: "UPDATE", detail: `Mengubah ${field} menjadi ${detailLog}` });
+            Toast.fire({ icon: 'success', title: 'Data diperbarui!' });
+        };
+
+        function loadUsersRealtime() {
+            if (unsubscribeUsers) unsubscribeUsers();
+            unsubscribeUsers = onSnapshot(collection(db, "users"), (snap) => {
+                const body = document.getElementById('userTableBody'); 
+                body.innerHTML = "";
+                if(snap.empty) { body.innerHTML = emptyStateHTML("Belum ada user"); return; }
+                
+                const docs = [];
+                snap.forEach(d => docs.push(d));
+                docs.sort((a, b) => (a.data().email || "").localeCompare(b.data().email || ""));
+
+                docs.forEach(d => {
+                    const r = d.data().role || "user";
+                    body.innerHTML += `<tr><td class="p-5 font-bold text-black">${d.data().email}</td><td><span class="px-2 py-1 rounded-lg text-[9px] font-extrabold uppercase ${r === 'admin' ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}">${r}</span></td><td class="text-right"><select onchange="updateRole('${d.id}', this.value)" class="text-[9px] border p-2 rounded-lg text-black bg-white"><option value="">--</option><option value="user">User</option><option value="perlengkapan">Perlengkapan</option><option value="admin">Admin</option></select></td></tr>`;
+                });
             });
         }
 
         window.updateRole = async (id, r) => { 
             if(!r) return; await updateDoc(doc(db, "users", id), { role: r }); 
-            loadUsers(); Toast.fire({ icon: 'info', title: 'Akses user diubah!' }); 
+            Toast.fire({ icon: 'info', title: 'Akses user diubah!' }); 
         };
 
-        async function loadAuditLogs() {
-            const body = document.getElementById('auditLogBody'); body.innerHTML = "";
-            const snap = await getDocs(query(collection(db, "logs_stok"), orderBy("waktu", "desc")));
-            if(snap.empty) { body.innerHTML = emptyStateHTML("Belum ada aktivitas"); return; }
-            snap.forEach(d => {
-                const t = d.data().waktu?.toDate().toLocaleString() || '-';
-                body.innerHTML += `<tr><td class="p-4 italic text-slate-500 text-xs">${t}</td><td class="p-4 text-black text-xs">${d.data().pelaku}</td><td class="p-4 text-center font-bold text-xs ${d.data().aksi === 'TAMBAH' ? 'text-emerald-600' : 'text-rose-600'}">${d.data().aksi}</td><td class="p-4 italic text-center text-black text-xs">${d.data().detail}</td></tr>`;
+        function loadAuditLogsRealtime() {
+            if (unsubscribeAuditLogs) unsubscribeAuditLogs();
+            unsubscribeAuditLogs = onSnapshot(query(collection(db, "logs_stok"), orderBy("waktu", "desc")), (snap) => {
+                const body = document.getElementById('auditLogBody'); 
+                body.innerHTML = "";
+                if(snap.empty) { body.innerHTML = emptyStateHTML("Belum ada aktivitas"); return; }
+                snap.forEach(d => {
+                    const t = d.data().waktu?.toDate().toLocaleString() || '-';
+                    body.innerHTML += `<tr><td class="p-4 italic text-slate-500 text-xs">${t}</td><td class="p-4 text-black text-xs">${d.data().pelaku}</td><td class="p-4 text-center font-bold text-xs ${d.data().aksi === 'TAMBAH' ? 'text-emerald-600' : 'text-rose-600'}">${d.data().aksi}</td><td class="p-4 italic text-center text-black text-xs">${d.data().detail}</td></tr>`;
+                });
             });
         }
 
@@ -290,7 +495,9 @@
                     const t = d.waktu_pinjam?.toDate().toLocaleString() || '-';
                     const peminjamEmail = d.peminjam || 'Unknown';
                     const peminjamName = peminjamEmail.includes('@') ? peminjamEmail.split('@')[0] : peminjamEmail;
-                    body.innerHTML += `<tr class="border-b border-slate-100"><td class="py-4 px-2 text-slate-500 italic text-xs">${t}</td><td class="py-4 px-2 uppercase font-bold text-black text-xs">${peminjamName}</td><td class="py-4 px-2 text-center font-extrabold uppercase text-black text-xs">${d.barang} (x${d.jumlah})</td><td class="py-4 px-2 text-center uppercase tracking-widest font-bold text-xs ${d.status === 'kembali' ? 'text-emerald-600' : 'text-amber-600'}">${d.status}</td><td class="py-4 px-2 text-right">${d.foto_url ? `<a href="${d.foto_url}" target="_blank" class="text-indigo-600 font-bold hover:underline italic">[ BUKTI ]</a>` : '-'}</td></tr>`;
+                    const tujuan = d.tujuan || '-';
+                    const tujuanBadge = tujuan === 'Misa' ? '<span class="px-2 py-1 rounded-lg text-[9px] font-extrabold uppercase bg-purple-100 text-purple-600">Misa</span>' : (tujuan === 'Latihan' ? '<span class="px-2 py-1 rounded-lg text-[9px] font-extrabold uppercase bg-amber-100 text-amber-600">Latihan</span>' : '<span class="text-slate-400 text-xs">-</span>');
+                    body.innerHTML += `<tr class="border-b border-slate-100"><td class="py-4 px-2 text-slate-500 italic text-xs">${t}</td><td class="py-4 px-2 uppercase font-bold text-black text-xs">${peminjamName}</td><td class="py-4 px-2 text-center font-extrabold uppercase text-black text-xs">${d.barang} (x${d.jumlah})</td><td class="py-4 px-2 text-center">${tujuanBadge}</td><td class="py-4 px-2 text-center uppercase tracking-widest font-bold text-xs ${d.status === 'kembali' ? 'text-emerald-600' : 'text-amber-600'}">${d.status}</td><td class="py-4 px-2 text-right">${d.foto_url ? `<a href="${d.foto_url}" target="_blank" class="text-indigo-600 font-bold hover:underline italic">[ BUKTI ]</a>` : '-'}</td></tr>`;
                 });
             });
         }
