@@ -56,7 +56,7 @@
     <script src="./config.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: window.ENV.FIREBASE_API_KEY,
@@ -68,6 +68,10 @@
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) window.location.replace('index.html');
+        });
 
         const btnLogin = document.getElementById('btnLogin');
         btnLogin.onclick = async () => {

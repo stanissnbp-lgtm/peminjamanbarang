@@ -44,7 +44,14 @@
     <div class="fixed top-0 -right-4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob pointer-events-none -z-10" style="animation-delay: 2s;"></div>
     <div class="fixed -bottom-8 left-20 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob pointer-events-none -z-10" style="animation-delay: 4s;"></div>
 
-    <div class="max-w-4xl mx-auto fade-in relative z-10">
+    <div id="authLoading" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-50">
+        <div class="text-center">
+            <h1 class="text-3xl font-extrabold text-slate-900 italic tracking-tighter">Misdinar<span class="text-indigo-600">.</span></h1>
+            <p class="mt-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 italic">Memeriksa sesi login...</p>
+        </div>
+    </div>
+
+    <div id="appShell" class="hidden max-w-4xl mx-auto fade-in relative z-10">
         <header class="sticky-header flex flex-col sm:flex-row gap-4 justify-between sm:items-end">
             <div>
                 <h1 class="text-4xl font-extrabold text-slate-900 italic tracking-tighter">Misdinar<span class="text-indigo-600">.</span></h1>
@@ -92,6 +99,12 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, getDoc, query, orderBy, onSnapshot, serverTimestamp, where, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        const redirectToLogin = () => window.location.replace('login.html');
+        if (!window.ENV) {
+            redirectToLogin();
+            throw new Error('Konfigurasi aplikasi belum tersedia.');
+        }
+
         const firebaseConfig = {
             apiKey: window.ENV.FIREBASE_API_KEY,
             authDomain: window.ENV.FIREBASE_AUTH_DOMAIN,
@@ -120,7 +133,9 @@
         const emptyStateHistory = `<div class="col-span-1 md:col-span-2 text-center py-10 opacity-50"><div class="text-4xl mb-3">📭</div><p class="font-bold text-slate-500 uppercase tracking-widest text-[10px]">Belum ada riwayat peminjaman</p></div>`;
 
         onAuthStateChanged(auth, async (user) => {
-            if (!user) { window.location.href = 'login.html'; } else {
+            if (!user) { redirectToLogin(); } else {
+                document.getElementById('authLoading').classList.add('hidden');
+                document.getElementById('appShell').classList.remove('hidden');
                 currentUserEmail = user.email;
                 document.getElementById('userEmailDisplay').innerText = "👤 " + user.email;
                 const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -308,7 +323,10 @@
                 } catch (e) { Swal.fire('Gagal Memproses', e.message, 'error'); }
             }
         };
-        document.getElementById('btnLogout').onclick = () => signOut(auth);
+        document.getElementById('btnLogout').onclick = async () => {
+            await signOut(auth);
+            redirectToLogin();
+        };
     </script>
 </body>
 </html>
