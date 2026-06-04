@@ -1,0 +1,10 @@
+window.ENV = {
+    FIREBASE_API_KEY: "AIzaSyBFX7SWWK8z0cQD3m4KNKjW3VCMbEjA_Tg",
+    FIREBASE_AUTH_DOMAIN: "testing-6b1d1.firebaseapp.com",
+    FIREBASE_PROJECT_ID: "testing-6b1d1",
+    FIREBASE_STORAGE_BUCKET: "testing-6b1d1.firebasestorage.app",
+    FIREBASE_MESSAGING_SENDER_ID: "301829936342",
+    FIREBASE_APP_ID: "1:301829936342:web:4584de1f4740d4c978e577",
+    CLOUDINARY_CLOUD_NAME: "dgb8s9njg",
+    CLOUDINARY_UPLOAD_PRESET: "misdinar_upload"
+};
