@@ -58,6 +58,19 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+        const showSetupError = () => {
+            Swal.fire(
+                'Konfigurasi belum tersedia',
+                'File config.js belum terbaca di website online. Upload config.js ke GitHub Pages dan pastikan domain GitHub Pages sudah ditambahkan di Firebase Authentication.',
+                'error'
+            );
+        };
+
+        if (!window.ENV) {
+            showSetupError();
+            throw new Error('config.js belum terbaca.');
+        }
+
         const firebaseConfig = {
             apiKey: window.ENV.FIREBASE_API_KEY,
             authDomain: window.ENV.FIREBASE_AUTH_DOMAIN,
@@ -68,6 +81,19 @@
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+
+        const getAuthErrorMessage = (error) => {
+            switch (error.code) {
+                case 'auth/unauthorized-domain':
+                    return 'Domain website belum diizinkan di Firebase. Tambahkan stanissnbp-lgtm.github.io pada Authorized domains.';
+                case 'auth/operation-not-allowed':
+                    return 'Metode login email dan kata sandi belum diaktifkan di Firebase Authentication.';
+                case 'auth/network-request-failed':
+                    return 'Koneksi ke Firebase gagal. Periksa koneksi internet atau konfigurasi Firebase.';
+                default:
+                    return 'Email atau kata sandi yang Anda masukkan tidak sesuai.';
+            }
+        };
 
         onAuthStateChanged(auth, (user) => {
             if (user) window.location.replace('index.html');
@@ -86,7 +112,7 @@
                 await signInWithEmailAndPassword(auth, email, pass);
                 window.location.href = 'index.html';
             } catch (e) { 
-                Swal.fire('Gagal!', 'Email atau kata sandi yang Anda masukkan tidak sesuai.', 'error'); 
+                Swal.fire('Gagal!', getAuthErrorMessage(e), 'error'); 
             } finally {
                 btnLogin.innerHTML = originalText;
                 btnLogin.disabled = false;
@@ -109,7 +135,7 @@
                     await sendPasswordResetEmail(auth, email);
                     Swal.fire('Terkirim!', 'Silakan periksa kotak masuk atau folder spam email Anda.', 'success');
                 } catch (e) {
-                    Swal.fire('Gagal!', e.message, 'error');
+                    Swal.fire('Gagal!', getAuthErrorMessage(e), 'error');
                 }
             }
         };

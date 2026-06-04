@@ -56,6 +56,19 @@
         import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+        const showSetupError = () => {
+            Swal.fire(
+                'Konfigurasi belum tersedia',
+                'File config.js belum terbaca di website online. Upload config.js ke GitHub Pages dan pastikan domain GitHub Pages sudah ditambahkan di Firebase Authentication.',
+                'error'
+            );
+        };
+
+        if (!window.ENV) {
+            showSetupError();
+            throw new Error('config.js belum terbaca.');
+        }
+
         const firebaseConfig = {
             apiKey: window.ENV.FIREBASE_API_KEY,
             authDomain: window.ENV.FIREBASE_AUTH_DOMAIN,
@@ -67,6 +80,27 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        const getRegisterErrorMessage = (error) => {
+            switch (error.code) {
+                case 'auth/unauthorized-domain':
+                    return 'Domain website belum diizinkan di Firebase. Tambahkan stanissnbp-lgtm.github.io pada Authorized domains.';
+                case 'auth/email-already-in-use':
+                    return 'Email ini sudah terdaftar. Silakan masuk menggunakan akun tersebut.';
+                case 'auth/invalid-email':
+                    return 'Format email tidak valid.';
+                case 'auth/weak-password':
+                    return 'Kata sandi terlalu lemah. Gunakan minimal 6 karakter.';
+                case 'auth/operation-not-allowed':
+                    return 'Pendaftaran dengan email dan kata sandi belum diaktifkan di Firebase Authentication.';
+                case 'permission-denied':
+                    return 'Akun berhasil dibuat, tetapi data user ditolak oleh Firestore Rules. Periksa aturan Firestore.';
+                case 'auth/network-request-failed':
+                    return 'Koneksi ke Firebase gagal. Periksa koneksi internet atau konfigurasi Firebase.';
+                default:
+                    return error.message || 'Pendaftaran gagal diproses.';
+            }
+        };
 
         const btnReg = document.getElementById('btnReg');
         btnReg.onclick = async () => {
@@ -83,7 +117,7 @@
                 await setDoc(doc(db, "users", cred.user.uid), { email, role: "user" });
                 Swal.fire('Berhasil!', 'Akun berhasil dibuat. Anda akan diarahkan ke dashboard.', 'success').then(() => window.location.href = 'index.html');
             } catch (e) { 
-                Swal.fire('Gagal!', e.message, 'error'); 
+                Swal.fire('Gagal!', getRegisterErrorMessage(e), 'error'); 
             } finally {
                 btnReg.innerHTML = originalText;
                 btnReg.disabled = false;
